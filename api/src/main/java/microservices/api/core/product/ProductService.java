@@ -14,5 +14,5 @@ public interface ProductService {
     @GetMapping(
             value    = "/product/{productId}",
             produces = "application/json")
-    Product getProduct(@PathVariable Long productId);
+    Product getProduct(@PathVariable int productId);
 }

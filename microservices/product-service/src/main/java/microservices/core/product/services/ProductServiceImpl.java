@@ -22,7 +22,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product getProduct(Long productId) {
+    public Product getProduct(int productId) {
         LOG.debug("/product return the found product for productId={}", productId);
 
         if (productId < 1) throw new InvalidInputException("Invalid productId: " + productId);
