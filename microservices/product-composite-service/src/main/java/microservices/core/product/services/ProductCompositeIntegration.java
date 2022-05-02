@@ -58,13 +58,15 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort + "/recommendation?productId=";
         reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review?productId=";
     }
-
+    
     public Product getProduct(int productId) {
 
         try {
             String url = productServiceUrl + productId;
             LOG.debug("Will call getProduct API on URL: {}", url);
 
+            System.out.println("Will call getProduct API on URL: " + url);
+            
             Product product = restTemplate.getForObject(url, Product.class);
             LOG.debug("Found a product with id: {}", product.getProductId());
 
