@@ -1,4 +1,4 @@
-package microservices.core.product.services;
+package microservices.core.productcomposite.services;
 
 import microservices.api.core.product.Product;
 import microservices.api.core.product.ProductService;

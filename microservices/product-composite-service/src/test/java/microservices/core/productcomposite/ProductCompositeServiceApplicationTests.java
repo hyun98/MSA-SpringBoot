@@ -1,9 +1,9 @@
-package microservices.core.product;
+package microservices.core.productcomposite;
 
 import microservices.api.core.product.Product;
 import microservices.api.core.recommendation.Recommendation;
 import microservices.api.core.review.Review;
-import microservices.core.product.services.ProductCompositeIntegration;
+import microservices.core.productcomposite.services.ProductCompositeIntegration;
 import microservices.util.exceptions.InvalidInputException;
 import microservices.util.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,4 +1,4 @@
-package microservices.core.product.services;
+package microservices.core.productcomposite.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import microservices.api.core.product.Product;
