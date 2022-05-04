@@ -1,6 +1,21 @@
-server.port: 7001
+server:
+  port: 7001
 
 logging:
   level:
     root: INFO
     microservices.core: DEBUG
+
+spring:
+  profiles:
+    group: 
+      "docker": "docker"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "docker"
+server:
+  port: 8080
+
