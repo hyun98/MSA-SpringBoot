@@ -19,6 +19,7 @@ jar {
 dependencies {
 	implementation project(':api')
 	implementation project(':util')
+	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	compileOnly 'org.projectlombok:lombok'
