@@ -2,9 +2,9 @@ package microservices.core.productcomposite.services;
 
 import lombok.RequiredArgsConstructor;
 import microservices.api.composite.product.*;
-import microservices.api.core.product.Product;
-import microservices.api.core.recommendation.Recommendation;
-import microservices.api.core.review.Review;
+import microservices.api.core.product.dto.ProductDTO;
+import microservices.api.core.recommendation.dto.RecommendationDTO;
+import microservices.api.core.review.dto.ReviewDTO;
 import microservices.util.exceptions.NotFoundException;
 import microservices.util.http.ServiceUtil;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,17 +29,17 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
     @Override
     public ProductAggregate getProduct(int productId) {
 
-        Product product = integration.getProduct(productId);
+        ProductDTO product = integration.getProduct(productId);
         if (product == null) throw new NotFoundException("No product found for productId: " + productId);
 
-        List<Recommendation> recommendations = integration.getRecommendations(productId);
+        List<RecommendationDTO> recommendations = integration.getRecommendations(productId);
 
-        List<Review> reviews = integration.getReviews(productId);
+        List<ReviewDTO> reviews = integration.getReviews(productId);
 
         return createProductAggregate(product, recommendations, reviews, serviceUtil.getServiceAddress());
     }
 
-    private ProductAggregate createProductAggregate(Product product, List<Recommendation> recommendations, List<Review> reviews, String serviceAddress) {
+    private ProductAggregate createProductAggregate(ProductDTO product, List<RecommendationDTO> recommendations, List<ReviewDTO> reviews, String serviceAddress) {
 
         // 1. Setup product info
         int productId = product.getProductId();

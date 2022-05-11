@@ -1,4 +1,7 @@
 spring:
   mongodb:
     embedded:
-      version: 3.6.5
+      version: 3.3.4
+  data:
+    mongodb:
+      auto-index-creation: true

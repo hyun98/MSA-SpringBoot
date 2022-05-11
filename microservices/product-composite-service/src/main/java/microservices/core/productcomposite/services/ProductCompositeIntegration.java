@@ -1,11 +1,11 @@
 package microservices.core.productcomposite.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import microservices.api.core.product.Product;
+import microservices.api.core.product.dto.ProductDTO;
 import microservices.api.core.product.ProductService;
-import microservices.api.core.recommendation.Recommendation;
+import microservices.api.core.recommendation.dto.RecommendationDTO;
 import microservices.api.core.recommendation.RecommendationService;
-import microservices.api.core.review.Review;
+import microservices.api.core.review.dto.ReviewDTO;
 import microservices.api.core.review.ReviewService;
 import microservices.util.exceptions.InvalidInputException;
 import microservices.util.exceptions.NotFoundException;
@@ -26,7 +26,7 @@ import java.util.List;
 import static org.springframework.http.HttpMethod.GET;
 
 @Component
-public class ProductCompositeIntegration implements ProductService, RecommendationService, ReviewService {
+public class ProductCompositeIntegration implements ProductService, RecommendationService, ReviewService{
 
     private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeIntegration.class);
 
@@ -59,7 +59,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review?productId=";
     }
     
-    public Product getProduct(int productId) {
+    public ProductDTO getProduct(int productId) {
 
         try {
             String url = productServiceUrl + productId;
@@ -67,7 +67,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
             System.out.println("Will call getProduct API on URL: " + url);
             
-            Product product = restTemplate.getForObject(url, Product.class);
+            ProductDTO product = restTemplate.getForObject(url, ProductDTO.class);
             LOG.debug("Found a product with id: {}", product.getProductId());
 
             return product;
@@ -90,6 +90,26 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         }
     }
 
+    @Override
+    public ProductDTO createProduct(ProductDTO body) {
+        return null;
+    }
+
+    @Override
+    public void deleteProduct(int productId) {
+
+    }
+
+    @Override
+    public RecommendationDTO createRecommendation(RecommendationDTO body) {
+        return null;
+    }
+
+    @Override
+    public void deleteRecommendations(int productId) {
+
+    }
+
     private String getErrorMessage(HttpClientErrorException ex) {
         try {
             return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
@@ -98,13 +118,13 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         }
     }
 
-    public List<Recommendation> getRecommendations(int productId) {
+    public List<RecommendationDTO> getRecommendations(int productId) {
 
         try {
             String url = recommendationServiceUrl + productId;
 
             LOG.debug("Will call getRecommendations API on URL: {}", url);
-            List<Recommendation> recommendations = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<List<Recommendation>>() {}).getBody();
+            List<RecommendationDTO> recommendations = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<List<RecommendationDTO>>() {}).getBody();
 
             LOG.debug("Found {} recommendations for a product with id: {}", recommendations.size(), productId);
             return recommendations;
@@ -115,13 +135,13 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         }
     }
 
-    public List<Review> getReviews(int productId) {
+    public List<ReviewDTO> getReviews(int productId) {
 
         try {
             String url = reviewServiceUrl + productId;
 
             LOG.debug("Will call getReviews API on URL: {}", url);
-            List<Review> reviews = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<List<Review>>() {}).getBody();
+            List<ReviewDTO> reviews = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<List<ReviewDTO>>() {}).getBody();
 
             LOG.debug("Found {} reviews for a product with id: {}", reviews.size(), productId);
             return reviews;

@@ -20,7 +20,10 @@ dependencies {
 	implementation project(':api')
 	implementation project(':util')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation ('org.springframework.boot:spring-boot-starter-webflux') {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-reactor-netty'
+	}
+	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
 	
 	// swagger 설정
 	implementation('io.springfox:springfox-boot-starter:3.0.0')

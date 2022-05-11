@@ -7,13 +7,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataMongoTest
-public class productEntityTest {
+public class productEntityTests {
 
     @Autowired
     private ProductRepository productRepository;
@@ -85,21 +94,61 @@ public class productEntityTest {
         //given
         ProductEntity productEntity = new ProductEntity(savedEntity.getProductId(), "n", 1);
 
-//        productRepository.save(productEntity);
-//        
-//        assertEqualsProduct(productEntity, savedEntity);
-//
-//        System.out.println("count : " + productRepository.count());
-//
-//        Optional<ProductEntity> byProductId = productRepository.findByProductId(productEntity.getProductId());
-//        System.out.println(byProductId.get().getProductId());
-
         //when
         DuplicateKeyException thrown = assertThrows(DuplicateKeyException.class, () -> {
             productRepository.save(productEntity);
         });
 
         System.out.println(thrown);
+    }
+
+    @Test
+    @DisplayName("낙관적 락 에러 테스트")
+    public void optimisticLockError() {
+        //given
+        ProductEntity productEntity1 = productRepository.findById(savedEntity.getId()).get();
+        ProductEntity productEntity2 = productRepository.findById(savedEntity.getId()).get();
+
+        //when
+        // 첫 번째 객체 업데이트
+        productEntity1.setName("n1");
+        productRepository.save(productEntity1);
+        
+        // 두 번째 객체 업데이트
+        // 두 번째 엔티티 객체의 버전이 낮으므로 실패할 것임
+        // 낙관적 락 오류가 발생해 실패한다.
+        try {
+            productEntity2.setName("n2");
+            productRepository.save(productEntity2);
+            fail("Expected an OptimisticLockingFailureException");
+        } catch (OptimisticLockingFailureException e) {
+
+        }
+        
+        //then
+        ProductEntity updatedEntity = productRepository.findById(savedEntity.getId()).get();
+        assertEquals(1, updatedEntity.getVersion());
+        assertEquals("n1", updatedEntity.getName());
+    }
+
+    @Test
+    @DisplayName("페이징 테스트")
+    public void paging() {
+        //given
+        productRepository.deleteAll();
+
+        List<ProductEntity> newProducts = IntStream.rangeClosed(1001, 1010).
+                mapToObj(i -> new ProductEntity(i, "name " + i, i)).
+                collect(Collectors.toList());
+        productRepository.saveAll(newProducts);
+        
+        //when
+        Pageable nextPage = PageRequest.of(0, 4, Sort.Direction.ASC, "productId");
+
+        //then
+        nextPage = testNextPage(nextPage, "[1001, 1002, 1003, 1004]", true);
+        nextPage = testNextPage(nextPage, "[1005, 1006, 1007, 1008]", true);
+        nextPage = testNextPage(nextPage, "[1009, 1010]", false);
     }
 
 
@@ -111,10 +160,17 @@ public class productEntityTest {
      * 
      */
     private void assertEqualsProduct(ProductEntity expectedEntity, ProductEntity actualEntity) {
-//        assertEquals(expectedEntity.getId(), actualEntity.getId());
+        assertEquals(expectedEntity.getId(), actualEntity.getId());
         assertEquals(expectedEntity.getVersion(), actualEntity.getVersion());
         assertEquals(expectedEntity.getProductId(), actualEntity.getProductId());
         assertEquals(expectedEntity.getName(), actualEntity.getName());
         assertEquals(expectedEntity.getWeight(), actualEntity.getWeight());
+    }
+
+    private Pageable testNextPage(Pageable nextPage, String expectedProductIds, boolean expectsNextPage) {
+        Page<ProductEntity> productPage = productRepository.findAll(nextPage);
+        assertEquals(expectedProductIds, productPage.getContent().stream().map(p -> p.getProductId()).collect(Collectors.toList()).toString());
+        assertEquals(expectsNextPage, productPage.hasNext());
+        return productPage.nextPageable();
     }
 }

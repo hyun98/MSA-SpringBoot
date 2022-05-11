@@ -1,8 +1,8 @@
 package microservices.core.productcomposite;
 
-import microservices.api.core.product.Product;
-import microservices.api.core.recommendation.Recommendation;
-import microservices.api.core.review.Review;
+import microservices.api.core.product.dto.ProductDTO;
+import microservices.api.core.recommendation.dto.RecommendationDTO;
+import microservices.api.core.review.dto.ReviewDTO;
 import microservices.core.productcomposite.services.ProductCompositeIntegration;
 import microservices.util.exceptions.InvalidInputException;
 import microservices.util.exceptions.NotFoundException;
@@ -36,11 +36,11 @@ class ProductCompositeServiceApplicationTests {
 	public void setUp() {
 
 		when(compositeIntegration.getProduct(PRODUCT_ID_OK)).
-				thenReturn(new Product(PRODUCT_ID_OK, "name", 1, "mock-address"));
+				thenReturn(new ProductDTO(PRODUCT_ID_OK, "name", 1, "mock-address"));
 		when(compositeIntegration.getRecommendations(PRODUCT_ID_OK)).
-				thenReturn(singletonList(new Recommendation(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address")));
+				thenReturn(singletonList(new RecommendationDTO(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address")));
 		when(compositeIntegration.getReviews(PRODUCT_ID_OK)).
-				thenReturn(singletonList(new Review(PRODUCT_ID_OK, 1, "author", "subject", "content", "mock address")));
+				thenReturn(singletonList(new ReviewDTO(PRODUCT_ID_OK, 1, "author", "subject", "content", "mock address")));
 
 		when(compositeIntegration.getProduct(PRODUCT_ID_NOT_FOUND)).thenThrow(new NotFoundException("NOT FOUND: " + PRODUCT_ID_NOT_FOUND));
 
