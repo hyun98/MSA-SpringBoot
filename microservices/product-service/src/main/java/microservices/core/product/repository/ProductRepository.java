@@ -1,6 +1,6 @@
-package microservices.core.productcomposite.repository;
+package microservices.core.product.repository;
 
-import microservices.core.productcomposite.domain.ProductEntity;
+import microservices.core.product.domain.ProductEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.Optional;

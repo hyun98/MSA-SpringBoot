@@ -1,7 +1,7 @@
-package microservices.core.productcomposite.services;
+package microservices.core.product.services;
 
 import microservices.api.core.product.dto.ProductDTO;
-import microservices.core.productcomposite.domain.ProductEntity;
+import microservices.core.product.domain.ProductEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

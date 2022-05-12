@@ -1,10 +1,10 @@
-package microservices.core.productcomposite.services;
+package microservices.core.product.services;
 
 import lombok.RequiredArgsConstructor;
 import microservices.api.core.product.dto.ProductDTO;
 import microservices.api.core.product.ProductService;
-import microservices.core.productcomposite.domain.ProductEntity;
-import microservices.core.productcomposite.repository.ProductRepository;
+import microservices.core.product.domain.ProductEntity;
+import microservices.core.product.repository.ProductRepository;
 import microservices.util.exceptions.InvalidInputException;
 import microservices.util.exceptions.NotFoundException;
 import microservices.util.http.ServiceUtil;

@@ -1,13 +1,15 @@
-package microservices.core.productcomposite.services;
+package microservices.core.product.services;
 
 import microservices.api.core.product.dto.ProductDTO;
-import microservices.core.productcomposite.repository.ProductRepository;
+import microservices.core.product.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -74,6 +76,7 @@ class ProductServiceTests {
 	}
 
 	@Test
+	@DisplayName("DELETE 멱등성")
 	public void deleteProduct() {
 		int productId = 1;
 		
@@ -86,12 +89,13 @@ class ProductServiceTests {
 		deleteAndVerifyProduct(productId, OK);
 	}
 
+	// ** Helper Method **
 
-	private WebTestClient.BodyContentSpec getAndVerifyProduct(int productId, HttpStatus expectedStatus) {
+	private BodyContentSpec getAndVerifyProduct(int productId, HttpStatus expectedStatus) {
 		return getAndVerifyProduct("/" + productId, expectedStatus);
 	}
 
-	private WebTestClient.BodyContentSpec getAndVerifyProduct(String productIdPath, HttpStatus expectedStatus) {
+	private BodyContentSpec getAndVerifyProduct(String productIdPath, HttpStatus expectedStatus) {
 		return client.get()
 				.uri("/product" + productIdPath)
 				.accept(APPLICATION_JSON)
@@ -101,7 +105,7 @@ class ProductServiceTests {
 				.expectBody();
 	}
 
-	private WebTestClient.BodyContentSpec postAndVerifyProduct(int productId, HttpStatus expectedStatus) {
+	private BodyContentSpec postAndVerifyProduct(int productId, HttpStatus expectedStatus) {
 		ProductDTO product = new ProductDTO(productId, "Name " + productId, productId, "SA");
 		
 		return client.post()
@@ -114,7 +118,7 @@ class ProductServiceTests {
 				.expectBody();
 	}
 
-	private WebTestClient.BodyContentSpec deleteAndVerifyProduct(int productId, HttpStatus expectedStatus) {
+	private BodyContentSpec deleteAndVerifyProduct(int productId, HttpStatus expectedStatus) {
 		return client.delete()
 				.uri("/product/" + productId)
 				.accept(APPLICATION_JSON)
