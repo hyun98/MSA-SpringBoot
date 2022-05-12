@@ -5,14 +5,25 @@ logging:
   level:
     root: INFO
     microservices.core: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
 
 spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: product-db
+      auto-index-creation: true
   profiles:
     group: 
       "docker": "docker"
 
 ---
 spring:
+  data:
+    mongodb:
+      host: mongodb
   config:
     activate:
       on-profile: "docker"

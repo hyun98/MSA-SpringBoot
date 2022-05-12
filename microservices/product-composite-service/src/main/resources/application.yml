@@ -11,10 +11,34 @@ api:
       name: Contact
       url: My
       email: me@mail.com
-
   product-composite:
     get-composite-product:
-      description: Returns a composite view of the specified product id
+      description: productId에 맞는 상품의 리뷰와 추천을 보여준다.
+      notes: |
+        # Normal
+        1. Product Information
+        2. Reviews
+        3. Recommendations
+        4. Service Address (No prod)
+        
+        # Exception
+        1. Product X : 404
+        2. No reviews, recommendations : continue
+    create-composite-product:
+      description: 상품 생성
+      notes: |
+        # Normal
+        Create product
+        
+        # Exception
+        1. productId 중복 : 422 - Unprocessable Entity (duplicate key)
+    
+    delete-composite-product:
+      description: 상품 삭제
+      notes: |
+        # Normal
+        상품 + 관련된 추천, 리뷰 전체 삭제.
+
 
 server:
   port: 7004

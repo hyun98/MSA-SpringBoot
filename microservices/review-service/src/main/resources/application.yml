@@ -1,19 +1,33 @@
 server.port: 7003
 
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/review-db
+    username: user
+    password: 1234
+    hikari:
+      initialization-fail-timeout: 60000
+  profiles:
+    group:
+      "docker": "docker"
+      
 logging:
   level:
     root: INFO
     microservices.core: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
-spring:
-  profiles:
-    group:
-      "docker": "docker"
 
 ---
 spring:
   config:
     activate:
       on-profile: "docker"
+  datasource:
+    url: jdbc:mysql://mysql:3306/review-db
 server:
   port: 8080
