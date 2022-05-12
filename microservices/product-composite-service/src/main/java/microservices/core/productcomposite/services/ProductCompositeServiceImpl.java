@@ -1,4 +1,4 @@
-package microservices.core.product.services;
+package microservices.core.productcomposite.services;
 
 import lombok.RequiredArgsConstructor;
 import microservices.api.composite.product.*;

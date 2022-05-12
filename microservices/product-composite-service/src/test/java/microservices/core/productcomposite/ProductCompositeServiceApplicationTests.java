@@ -3,7 +3,7 @@ package microservices.core.productcomposite;
 import microservices.api.core.product.dto.ProductDTO;
 import microservices.api.core.recommendation.dto.RecommendationDTO;
 import microservices.api.core.review.dto.ReviewDTO;
-import microservices.core.product.services.ProductCompositeIntegration;
+import microservices.core.productcomposite.services.ProductCompositeIntegration;
 import microservices.util.exceptions.InvalidInputException;
 import microservices.util.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;

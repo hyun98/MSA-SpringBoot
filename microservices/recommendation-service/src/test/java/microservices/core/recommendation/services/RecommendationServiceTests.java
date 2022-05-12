@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -22,24 +23,25 @@ public class RecommendationServiceTests {
 	@Autowired
 	private WebTestClient client;
 	@Autowired
-	private RecommendationRepository repository;
+	private RecommendationRepository recommendationRepository;
 
 
 	@BeforeEach
 	public void setupDb() {
-		repository.deleteAll();
+		recommendationRepository.deleteAll();
 	}
 
 	@Test
 	public void getRecommendationsByProductId() {
 
+		//given
 		int productId = 1;
 
 		postAndVerifyRecommendation(productId, 1, OK);
 		postAndVerifyRecommendation(productId, 2, OK);
 		postAndVerifyRecommendation(productId, 3, OK);
 
-		assertEquals(3, repository.findByProductId(productId).size());
+		assertEquals(3, recommendationRepository.findByProductId(productId).size());
 
 		getAndVerifyRecommendationsByProductId(productId, OK)
 				.jsonPath("$.length()").isEqualTo(3)
@@ -57,13 +59,13 @@ public class RecommendationServiceTests {
 				.jsonPath("$.productId").isEqualTo(productId)
 				.jsonPath("$.recommendationId").isEqualTo(recommendationId);
 
-		assertEquals(1, repository.count());
+		assertEquals(1, recommendationRepository.count());
 
 		postAndVerifyRecommendation(productId, recommendationId, UNPROCESSABLE_ENTITY)
 				.jsonPath("$.path").isEqualTo("/recommendation")
 				.jsonPath("$.message").isEqualTo("Duplicate key, Product Id: 1, Recommendation Id:1");
 
-		assertEquals(1, repository.count());
+		assertEquals(1, recommendationRepository.count());
 	}
 
 	@Test
@@ -73,10 +75,10 @@ public class RecommendationServiceTests {
 		int recommendationId = 1;
 
 		postAndVerifyRecommendation(productId, recommendationId, OK);
-		assertEquals(1, repository.findByProductId(productId).size());
+		assertEquals(1, recommendationRepository.findByProductId(productId).size());
 
 		deleteAndVerifyRecommendationsByProductId(productId, OK);
-		assertEquals(0, repository.findByProductId(productId).size());
+		assertEquals(0, recommendationRepository.findByProductId(productId).size());
 
 		deleteAndVerifyRecommendationsByProductId(productId, OK);
 	}
@@ -112,11 +114,11 @@ public class RecommendationServiceTests {
 				.jsonPath("$.message").isEqualTo("Invalid productId: " + productIdInvalid);
 	}
 
-	private WebTestClient.BodyContentSpec getAndVerifyRecommendationsByProductId(int productId, HttpStatus expectedStatus) {
+	private BodyContentSpec getAndVerifyRecommendationsByProductId(int productId, HttpStatus expectedStatus) {
 		return getAndVerifyRecommendationsByProductId("?productId=" + productId, expectedStatus);
 	}
 
-	private WebTestClient.BodyContentSpec getAndVerifyRecommendationsByProductId(String productIdQuery, HttpStatus expectedStatus) {
+	private BodyContentSpec getAndVerifyRecommendationsByProductId(String productIdQuery, HttpStatus expectedStatus) {
 		return client.get()
 				.uri("/recommendation" + productIdQuery)
 				.accept(APPLICATION_JSON)
@@ -126,7 +128,7 @@ public class RecommendationServiceTests {
 				.expectBody();
 	}
 
-	private WebTestClient.BodyContentSpec postAndVerifyRecommendation(int productId, int recommendationId, HttpStatus expectedStatus) {
+	private BodyContentSpec postAndVerifyRecommendation(int productId, int recommendationId, HttpStatus expectedStatus) {
 		RecommendationDTO recommendation = new RecommendationDTO(productId, recommendationId, "Author " + recommendationId, recommendationId, "Content " + recommendationId, "SA");
 		return client.post()
 				.uri("/recommendation")
@@ -138,7 +140,7 @@ public class RecommendationServiceTests {
 				.expectBody();
 	}
 
-	private WebTestClient.BodyContentSpec deleteAndVerifyRecommendationsByProductId(int productId, HttpStatus expectedStatus) {
+	private BodyContentSpec deleteAndVerifyRecommendationsByProductId(int productId, HttpStatus expectedStatus) {
 		return client.delete()
 				.uri("/recommendation?productId=" + productId)
 				.accept(APPLICATION_JSON)

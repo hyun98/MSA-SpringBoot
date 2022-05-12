@@ -14,7 +14,7 @@ public interface ReviewMapper {
     @Mappings({
             @Mapping(target = "serviceAddress", ignore = true)
     })
-    ReviewDTO EntityToDTO(ReviewEntity entity);
+    ReviewDTO entityToDTO(ReviewEntity entity);
     
     @Mappings({
             @Mapping(target = "id", ignore = true),
