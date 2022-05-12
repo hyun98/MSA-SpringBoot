@@ -55,8 +55,8 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         this.mapper = mapper;
 
         productServiceUrl        = "http://" + productServiceHost + ":" + productServicePort + "/product/";
-        recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort + "/recommendation?productId=";
-        reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review?productId=";
+        recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort + "/recommendation";
+        reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review";
     }
     
     public ProductDTO getProduct(int productId) {
@@ -107,6 +107,16 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     @Override
     public void deleteRecommendations(int productId) {
+        
+    }
+
+    @Override
+    public ReviewDTO createReview(ReviewDTO body) {
+        return null;
+    }
+
+    @Override
+    public void deleteReviews(int productId) {
 
     }
 
