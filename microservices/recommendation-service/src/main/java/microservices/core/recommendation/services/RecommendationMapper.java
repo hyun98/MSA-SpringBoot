@@ -11,13 +11,13 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface RecommendationMapper {
     @Mappings({
-            @Mapping(target = "rate", source = "entity.rating"),
+            @Mapping(target = "rate", source = "rating"),
             @Mapping(target = "serviceAddress", ignore = true)
     })
     RecommendationDTO entityToDTO(RecommendationEntity entity);
 
     @Mappings({
-            @Mapping(target = "rating", source="api.rate"),
+            @Mapping(target = "rating", source="rate"),
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "version", ignore = true)
     })
