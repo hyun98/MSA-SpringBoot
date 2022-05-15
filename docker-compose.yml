@@ -1,11 +1,11 @@
-version: '3.3'
+version: '2.4'
 
 services:
   product:
     build: microservices/product-service
     mem_limit: 350m
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      SPRING_PROFILES_ACTIVE: docker
     depends_on:
       - mongodb
 
@@ -41,7 +41,8 @@ services:
     
     # $ mongo
   mongodb:
-    image: mongo:3.6.9
+    image: arm64v8/mongo:4.0
+#    platform: "linux/x86_64"
     mem_limit: 350m
     ports:
       - "27017:27017"
@@ -50,6 +51,7 @@ services:
   # $ mysql -uroot -h127.0.0.1 -p
   mysql:
     image: mysql:5.7
+    platform: "linux/x86_64"
     mem_limit: 350m
     ports:
       - "3306:3306"
