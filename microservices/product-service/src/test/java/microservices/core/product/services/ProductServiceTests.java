@@ -11,8 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -30,13 +29,16 @@ class ProductServiceTests {
 	
 	@BeforeEach
 	public void setupDb(){
-		productRepository.deleteAll();
+		productRepository.deleteAll().block();
 	}
 
 	@Test
 	public void getProductById() {
 
 		int productId = 1;
+		
+		assertNull(productRepository.findByProductId(productId).block());
+		assertEquals(0, (long)productRepository.count().block());
 
 		postAndVerifyProduct(productId, OK);
 
