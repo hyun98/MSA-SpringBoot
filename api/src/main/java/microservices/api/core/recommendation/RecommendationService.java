@@ -2,6 +2,7 @@ package microservices.api.core.recommendation;
 
 import microservices.api.core.recommendation.dto.RecommendationDTO;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public interface RecommendationService {
     @GetMapping(
             value    = "/recommendation",
             produces = "application/json")
-    List<RecommendationDTO> getRecommendations(@RequestParam(value = "productId", required = true) int productId);
+    Flux<RecommendationDTO> getRecommendations(@RequestParam(value = "productId", required = true) int productId);
 
     /**
      * Sample usage:

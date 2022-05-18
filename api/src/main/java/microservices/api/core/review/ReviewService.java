@@ -2,6 +2,7 @@ package microservices.api.core.review;
 
 import microservices.api.core.review.dto.ReviewDTO;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -16,12 +17,11 @@ public interface ReviewService {
     @GetMapping(
             value = "/review",
             produces = "application/json")
-    List<ReviewDTO> getReviews(@RequestParam(value = "productId", required = true) int productId);
+    Flux<ReviewDTO> getReviews(@RequestParam(value = "productId", required = true) int productId);
 
     @PostMapping(
             value = "/review",
-            produces = "application/json",
-            consumes = "application/json")
+            produces = "application/json")
     ReviewDTO createReview(@RequestBody ReviewDTO body);
 
     @DeleteMapping(value = "/review")

@@ -11,8 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,43 +23,47 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     private final ServiceUtil serviceUtil;
 
-    private final RecommendationRepository repository;
+    private final RecommendationRepository recommendationRepository;
 
     private final RecommendationMapper mapper;
 
 
     @Override
     public RecommendationDTO createRecommendation(RecommendationDTO body) {
-        try {
-            RecommendationEntity entity = mapper.DTOToEntity(body);
-            RecommendationEntity newEntity = repository.save(entity);
+        
+        if(body.getProductId() < 1) throw new InvalidInputException("Invalid productId: " + body.getProductId());
 
-            LOG.debug("createRecommendation: created a recommendation entity: {}/{}", body.getProductId(), body.getRecommendationId());
-            return mapper.entityToDTO(newEntity);
-
-        } catch (DuplicateKeyException dke) {
-            throw new InvalidInputException("Duplicate key, Product Id: " + body.getProductId() + ", Recommendation Id:" + body.getRecommendationId());
-        }
+        RecommendationEntity entity = mapper.DTOToEntity(body);
+        Mono<RecommendationDTO> newEntity = recommendationRepository.save(entity)
+                .log()
+                .onErrorMap(
+                        DuplicateKeyException.class,
+                        ex -> new InvalidInputException("Duplicate key, Product Id: " + body.getProductId() + ", Recommendation Id:" + body.getRecommendationId()))
+                .map(e -> mapper.entityToDTO(e));
+        
+        return newEntity.block();
     }
 
     @Override
-    public List<RecommendationDTO> getRecommendations(int productId) {
+    public Flux<RecommendationDTO> getRecommendations(int productId) {
 
         if (productId < 1) throw new InvalidInputException("Invalid productId: " + productId);
 
-        List<RecommendationEntity> entityList = repository.findByProductId(productId);
-        List<RecommendationDTO> list = mapper.entityListToDTOList(entityList);
-        list.forEach(e -> e.setServiceAddress(serviceUtil.getServiceAddress()));
-
-        LOG.debug("getRecommendations: response size: {}", list.size());
-
-        return list;
+        return recommendationRepository.findByProductId(productId)
+                .log()
+                .map(e -> mapper.entityToDTO(e))
+                .map(e -> {
+                    e.setServiceAddress(serviceUtil.getServiceAddress());
+                    return e;
+                });
     }
 
     @Override
     public void deleteRecommendations(int productId) {
+        if (productId < 1) throw new InvalidInputException("Invalid productId: " + productId);
+
         LOG.debug("deleteRecommendations: tries to delete recommendations for the product with productId: {}", productId);
-        repository.deleteAll(repository.findByProductId(productId));
+        recommendationRepository.deleteAll(recommendationRepository.findByProductId(productId)).block();
     }
 }
 

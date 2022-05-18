@@ -22,10 +22,10 @@ public class RecommendationEntityTest {
 
     @BeforeEach
     public void setupDb() {
-        recommandationRepository.deleteAll();
+        recommandationRepository.deleteAll().block();
 
         RecommendationEntity entity = new RecommendationEntity(1, 2, "a", 3, "c");
-        savedEntity = recommandationRepository.save(entity);
+        savedEntity = recommandationRepository.save(entity).block();
 
         assertEqualsRecommendation(entity, savedEntity);
     }
@@ -34,9 +34,9 @@ public class RecommendationEntityTest {
     public void create() {
 
         RecommendationEntity newEntity = new RecommendationEntity(1, 3, "a", 3, "c");
-        recommandationRepository.save(newEntity);
+        recommandationRepository.save(newEntity).block();
 
-        RecommendationEntity foundEntity = recommandationRepository.findById(newEntity.getId()).get();
+        RecommendationEntity foundEntity = recommandationRepository.findById(newEntity.getId()).block();
         assertEqualsRecommendation(newEntity, foundEntity);
 
         assertEquals(2, recommandationRepository.count());
@@ -45,9 +45,9 @@ public class RecommendationEntityTest {
     @Test
     public void update() {
         savedEntity.setAuthor("a2");
-        recommandationRepository.save(savedEntity);
+        recommandationRepository.save(savedEntity).block();
 
-        RecommendationEntity foundEntity = recommandationRepository.findById(savedEntity.getId()).get();
+        RecommendationEntity foundEntity = recommandationRepository.findById(savedEntity.getId()).block();
         assertEquals(1, foundEntity.getVersion());
         assertEquals("a2", foundEntity.getAuthor());
     }
@@ -55,12 +55,12 @@ public class RecommendationEntityTest {
     @Test
     public void delete() {
         recommandationRepository.delete(savedEntity);
-        assertFalse(recommandationRepository.existsById(savedEntity.getId()));
+        assertFalse(recommandationRepository.existsById(savedEntity.getId()).block());
     }
 
     @Test
     public void getByProductId() {
-        List<RecommendationEntity> entityList = recommandationRepository.findByProductId(savedEntity.getProductId());
+        List<RecommendationEntity> entityList = recommandationRepository.findByProductId(savedEntity.getProductId()).collectList().block();
 
         assertEquals(entityList.size(), 1);
         assertEqualsRecommendation(savedEntity, entityList.get(0));
@@ -71,27 +71,27 @@ public class RecommendationEntityTest {
         RecommendationEntity entity = new RecommendationEntity(1, 2, "a", 3, "c");
         
         DuplicateKeyException thrown = assertThrows(DuplicateKeyException.class, () -> {
-            recommandationRepository.save(entity);
+            recommandationRepository.save(entity).block();
         });
     }
 
     @Test
     public void optimisticLockError() {
 
-        RecommendationEntity entity1 = recommandationRepository.findById(savedEntity.getId()).get();
-        RecommendationEntity entity2 = recommandationRepository.findById(savedEntity.getId()).get();
+        RecommendationEntity entity1 = recommandationRepository.findById(savedEntity.getId()).block();
+        RecommendationEntity entity2 = recommandationRepository.findById(savedEntity.getId()).block();
 
         entity1.setAuthor("a1");
-        recommandationRepository.save(entity1);
+        recommandationRepository.save(entity1).block();
 
         try {
             entity2.setAuthor("a2");
-            recommandationRepository.save(entity2);
+            recommandationRepository.save(entity2).block();
 
             fail("Expected an OptimisticLockingFailureException");
         } catch (OptimisticLockingFailureException e) {}
 
-        RecommendationEntity updatedEntity = recommandationRepository.findById(savedEntity.getId()).get();
+        RecommendationEntity updatedEntity = recommandationRepository.findById(savedEntity.getId()).block();
         assertEquals(1, updatedEntity.getVersion());
         assertEquals("a1", updatedEntity.getAuthor());
     }

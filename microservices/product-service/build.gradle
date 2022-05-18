@@ -39,6 +39,7 @@ dependencies {
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
 	implementation "org.springframework.boot:spring-boot-starter-data-mongodb-reactive"
+	
 	//  내장형 몽고db를 사용해 Junit 테스트를 실행하기 위함
 	testImplementation "de.flapdoodle.embed:de.flapdoodle.embed.mongo"
 

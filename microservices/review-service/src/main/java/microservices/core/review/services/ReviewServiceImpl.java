@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,18 +29,25 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
 
     private final ReviewMapper reviewMapper;
+
+    private final Scheduler scheduler;
+
     
     @Override
-    public List<ReviewDTO> getReviews(int productId) {
+    public Flux<ReviewDTO> getReviews(int productId) {
         
         if (productId < 1) throw new InvalidInputException("Invalid productId: " + productId);
 
+        return asyncFlux(getByProductId(productId)).log();
+    }
+
+    protected List<ReviewDTO> getByProductId(int productId) {
         List<ReviewEntity> entityList = reviewRepository.findByProductId(productId);
         List<ReviewDTO> list = reviewMapper.entityListToDTOList(entityList);
         list.forEach(e -> e.setServiceAddress(serviceUtil.getServiceAddress()));
 
         LOG.debug("getReviews: response size: {}", list.size());
-        
+
         return list;
     }
 
@@ -63,5 +72,9 @@ public class ReviewServiceImpl implements ReviewService {
     public void deleteReviews(int productId) {
         LOG.debug("deleteReviews: tries to delete reviews for the product with productId: {}", productId);
         reviewRepository.deleteAll(reviewRepository.findByProductId(productId));
+    }
+
+    private <T> Flux<T> asyncFlux(Iterable<T> iterable) {
+        return Flux.fromIterable(iterable).publishOn(scheduler);
     }
 }

@@ -26,7 +26,7 @@ class ProductServiceTests {
 
 	@Autowired
 	private ProductRepository productRepository;
-	
+
 	@BeforeEach
 	public void setupDb(){
 		productRepository.deleteAll().block();
@@ -36,7 +36,7 @@ class ProductServiceTests {
 	public void getProductById() {
 
 		int productId = 1;
-		
+
 		assertNull(productRepository.findByProductId(productId).block());
 		assertEquals(0, (long)productRepository.count().block());
 
@@ -81,7 +81,7 @@ class ProductServiceTests {
 	@DisplayName("DELETE 멱등성")
 	public void deleteProduct() {
 		int productId = 1;
-		
+
 		postAndVerifyProduct(productId, OK);
 		assertTrue(productRepository.findByProductId(productId).isPresent());
 
@@ -109,7 +109,7 @@ class ProductServiceTests {
 
 	private BodyContentSpec postAndVerifyProduct(int productId, HttpStatus expectedStatus) {
 		ProductDTO product = new ProductDTO(productId, "Name " + productId, productId, "SA");
-		
+
 		return client.post()
 				.uri("/product")
 				.body(just(product), ProductDTO.class)
