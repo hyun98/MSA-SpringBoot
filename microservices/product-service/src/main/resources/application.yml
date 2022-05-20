@@ -15,9 +15,35 @@ spring:
       port: 27017
       database: product-db
       auto-index-creation: true
+      
   profiles:
     group: 
       "docker": "docker"
+      
+  cloud:
+    stream:
+      rabbit:
+        bindings:
+          input:
+            consumer:
+              autoBindDlq: true
+              republishToDlq: true
+      kafka:
+        bindings:
+          input:
+            consumer:
+              enableDlq: true
+      bindings:
+        input:
+          destination: products
+          group: productsGroup
+          consumer:
+            partitioned: true
+            instance-index: 0
+            maxAttempts: 3
+            backOffInitialInterval: 500
+            backOffMaxInterval: 1000
+            backOffMultiplier: 2.0
 
 ---
 spring:

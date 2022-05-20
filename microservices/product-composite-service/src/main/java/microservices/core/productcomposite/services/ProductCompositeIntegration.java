@@ -7,6 +7,7 @@ import microservices.api.core.recommendation.dto.RecommendationDTO;
 import microservices.api.core.recommendation.RecommendationService;
 import microservices.api.core.review.dto.ReviewDTO;
 import microservices.api.core.review.ReviewService;
+import microservices.api.event.Event;
 import microservices.util.exceptions.InvalidInputException;
 import microservices.util.exceptions.NotFoundException;
 import microservices.util.http.HttpErrorInfo;
@@ -14,12 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static microservices.api.event.Event.Type.CREATE;
 import static org.springframework.http.HttpMethod.GET;
 import static reactor.core.publisher.Flux.empty;
 
@@ -42,10 +43,13 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     private final String productServiceUrl;
     private final String recommendationServiceUrl;
     private final String reviewServiceUrl;
+    
+    @Autowired
+    private StreamBridge streamBridge;
+    
 
     @Autowired
     public ProductCompositeIntegration(
-            RestTemplate restTemplate,
             ObjectMapper mapper,
 
             @Value("${app.product-service.host}") String productServiceHost,
@@ -84,31 +88,13 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     
     @Override
     public ProductDTO createProduct(ProductDTO body) {
-        try {
-            String url = productServiceUrl;
-            LOG.debug("Will post a new product to URL: {}", url);
-
-            ProductDTO product = restTemplate.postForObject(url, body, ProductDTO.class);
-            LOG.debug("Created a product with id: {}", product.getProductId());
-
-            return product;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        streamBridge.send("product-out-0", new Event(CREATE, body.getProductId(), body));
+        return body;
     }
 
     @Override
     public void deleteProduct(int productId) {
-        try {
-            String url = productServiceUrl + "/" + productId;
-            LOG.debug("Will call the deleteProduct API on URL: {}", url);
-
-            restTemplate.delete(url);
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        streamBridge.send("product-out-0", new Event(CREATE, productId, null));
     }
 
     
@@ -172,21 +158,12 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     
     // Review
     @Override
-    public List<ReviewDTO> getReviews(int productId) {
+    public Flux<ReviewDTO> getReviews(int productId) {
+        String url = reviewServiceUrl + "?productId=" + productId;
+        LOG.debug("Will call the getReviews API on URL: {}", url);
 
-        try {
-            String url = reviewServiceUrl + "?productId=" + productId;
-
-            LOG.debug("Will call the getReviews API on URL: {}", url);
-            List<ReviewDTO> reviews = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<List<ReviewDTO>>() {}).getBody();
-
-            LOG.debug("Found {} reviews for a product with id: {}", reviews.size(), productId);
-            return reviews;
-
-        } catch (Exception ex) {
-            LOG.warn("Got an exception while requesting reviews, return zero reviews: {}", ex.getMessage());
-            return new ArrayList<>();
-        }
+        return webClient.get().uri(url).retrieve()
+                .bodyToFlux(ReviewDTO.class).onErrorResume(error -> empty());
     }
 
     @Override

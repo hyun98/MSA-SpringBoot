@@ -65,12 +65,52 @@ spring:
   profiles:
     group:
       "docker": "docker"
+  rabbitmq:
+    host: 127.0.0.1
+      port: 5672
+      username: guest
+      password: guest
+  cloud:
+    function:
+      definition: products;recommendations;reviews
+      
+    stream:
+      kafka:
+        binder:
+          brokers: 127.0.0.1
+          defaultBrokerPort: 9092
+          
+      defaultBinder: rabbit
+      
+      default:
+        contentType: application/json
+        
+      bindings:
+        products-out-0:
+          destination: products
+          producer:
+            required-groups: auditGroup
+        recommendations-out-0:
+          destination: recommendations
+          producer:
+            required-groups: auditGroup
+        reviews-out-0:
+          destination: reviews
+          producer:
+            required-groups: auditGroup
 
 ---
 spring:
   config:
     activate:
       on-profile: "docker"
+  rabbitmq:
+    host: rabbitmq
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: kafka
       
 server:
   port: 8080
