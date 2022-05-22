@@ -21,16 +21,6 @@ public class ProductCompositeServiceApplication {
 	RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-
-	@Bean
-	public Supplier<Event> products() {
-		return () -> products().get();
-	}
-	
-	@Bean
-	public Function<String, String> toUpperCase() {
-		return s -> s.toUpperCase();
-	}
 	
 	public static void main(String[] args) {
 		SpringApplication.run(ProductCompositeServiceApplication.class, args);
