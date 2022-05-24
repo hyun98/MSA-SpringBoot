@@ -24,31 +24,29 @@ jar {
 dependencies {
 	implementation project(':api')
 	implementation project(':util')
-	
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation ('org.springframework.boot:spring-boot-starter-webflux')
-
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation "org.springframework.boot:spring-boot-starter-data-mongodb-reactive"
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
-	testImplementation 'org.springframework.cloud:spring-cloud-stream-test-support'
-	
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
-
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+
+	compileOnly 'org.projectlombok:lombok'
 	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+	testCompileOnly 'org.projectlombok:lombok'
 	testCompileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+	testAnnotationProcessor 'org.projectlombok:lombok'
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
-	implementation "org.springframework.boot:spring-boot-starter-data-mongodb-reactive"
-	//  내장형 몽고db를 사용해 Junit 테스트를 실행하기 위함
+	//  내장형 몽고db를 사용해 Junit 테스트 실행
 	testImplementation "de.flapdoodle.embed:de.flapdoodle.embed.mongo"
-
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 dependencyManagement {

@@ -24,20 +24,14 @@ dependencies {
 	implementation project(':api')
 	implementation project(':util')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation ('org.springframework.boot:spring-boot-starter-webflux') {
-		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-reactor-netty'
-	}
-	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
-
+	implementation ('org.springframework.boot:spring-boot-starter-webflux')
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
-	testImplementation 'org.springframework.cloud:spring-cloud-stream-test-support'
-	
 	// swagger 설정
 	implementation('io.springfox:springfox-boot-starter:3.0.0')
-    implementation 'junit:junit:4.13.1'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.cloud:spring-cloud-stream-test-support'
 	testImplementation 'io.projectreactor:reactor-test'
 	
 	annotationProcessor 'org.projectlombok:lombok'
