@@ -1,0 +1,7 @@
+logging:
+  level:
+    microservices: DEBUG
+
+spring:
+  datasource:
+    url: "jdbc:h2:mem:review-db"
