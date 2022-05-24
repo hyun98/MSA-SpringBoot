@@ -9,6 +9,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
+import org.springframework.web.reactive.function.BodyInserters;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -99,9 +104,17 @@ class ReviewServiceTests {
 				.jsonPath("$.path").isEqualTo("/review");
 	}
 
+	public static byte[] convertObjectToBytes(Object obj) throws IOException {
+		ByteArrayOutputStream boas = new ByteArrayOutputStream();
+		try (ObjectOutputStream ois = new ObjectOutputStream(boas)) {
+			ois.writeObject(obj);
+			return boas.toByteArray();
+		}
+	}
+
 	@Test
 	public void getReviewsInvalidParameter() {
-
+		
 		client.get()
 				.uri("/review?productId=no-integer")
 				.accept(APPLICATION_JSON)
@@ -160,7 +173,7 @@ class ReviewServiceTests {
 		ReviewDTO review = new ReviewDTO(productId, reviewId, "Author " + reviewId, "Subject " + reviewId, "Content " + reviewId, "SA");
 		return client.post()
 				.uri("/review")
-				.body(just(review), ReviewDTO.class)
+				.body(BodyInserters.fromValue(review))
 				.accept(APPLICATION_JSON)
 				.exchange()
 				.expectStatus().isEqualTo(expectedStatus)
