@@ -39,7 +39,7 @@ public class RecommendationEntityTest {
         RecommendationEntity foundEntity = recommandationRepository.findById(newEntity.getId()).block();
         assertEqualsRecommendation(newEntity, foundEntity);
 
-        assertEquals(2, recommandationRepository.count());
+        assertEquals(2, recommandationRepository.count().block());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class RecommendationEntityTest {
 
     @Test
     public void delete() {
-        recommandationRepository.delete(savedEntity);
+        recommandationRepository.delete(savedEntity).block();
         assertFalse(recommandationRepository.existsById(savedEntity.getId()).block());
     }
 

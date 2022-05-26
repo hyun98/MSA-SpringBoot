@@ -22,13 +22,13 @@ public class RecommendationServiceTests {
 
 	@Autowired
 	private WebTestClient client;
+	
 	@Autowired
 	private RecommendationRepository recommendationRepository;
-
-
+	
 	@BeforeEach
 	public void setupDb() {
-		recommendationRepository.deleteAll();
+		recommendationRepository.deleteAll().block();
 	}
 
 	@Test
@@ -41,7 +41,7 @@ public class RecommendationServiceTests {
 		postAndVerifyRecommendation(productId, 2, OK);
 		postAndVerifyRecommendation(productId, 3, OK);
 
-		assertEquals(3, recommendationRepository.findByProductId(productId).size());
+		assertEquals(3, recommendationRepository.findByProductId(productId).count().block());
 
 		getAndVerifyRecommendationsByProductId(productId, OK)
 				.jsonPath("$.length()").isEqualTo(3)
@@ -59,13 +59,13 @@ public class RecommendationServiceTests {
 				.jsonPath("$.productId").isEqualTo(productId)
 				.jsonPath("$.recommendationId").isEqualTo(recommendationId);
 
-		assertEquals(1, recommendationRepository.count());
+		assertEquals(1, recommendationRepository.count().block());
 
 		postAndVerifyRecommendation(productId, recommendationId, UNPROCESSABLE_ENTITY)
 				.jsonPath("$.path").isEqualTo("/recommendation")
 				.jsonPath("$.message").isEqualTo("Duplicate key, Product Id: 1, Recommendation Id:1");
 
-		assertEquals(1, recommendationRepository.count());
+		assertEquals(1, recommendationRepository.count().block());
 	}
 
 	@Test
@@ -75,10 +75,10 @@ public class RecommendationServiceTests {
 		int recommendationId = 1;
 
 		postAndVerifyRecommendation(productId, recommendationId, OK);
-		assertEquals(1, recommendationRepository.findByProductId(productId).size());
+		assertEquals(1, recommendationRepository.findByProductId(productId).count().block());
 
 		deleteAndVerifyRecommendationsByProductId(productId, OK);
-		assertEquals(0, recommendationRepository.findByProductId(productId).size());
+		assertEquals(0, recommendationRepository.findByProductId(productId).count().block());
 
 		deleteAndVerifyRecommendationsByProductId(productId, OK);
 	}
