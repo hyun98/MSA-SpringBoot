@@ -6,6 +6,10 @@ import reactor.core.publisher.Mono;
 
 public interface ProductService {
 
+    @PostMapping(
+            value    = "/product",
+            consumes = "application/json",
+            produces = "application/json")
     ProductDTO createProduct(@RequestBody ProductDTO body);
 
     /**
@@ -19,5 +23,6 @@ public interface ProductService {
             produces = "application/json")
     Mono<ProductDTO> getProduct(@PathVariable int productId);
 
+    @DeleteMapping(value = "/product/{productId}")
     void deleteProduct(@PathVariable int productId);
 }
