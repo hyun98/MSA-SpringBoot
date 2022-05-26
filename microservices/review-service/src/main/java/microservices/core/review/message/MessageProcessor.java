@@ -21,7 +21,7 @@ public class MessageProcessor {
 
     // review-in-0
     @Bean
-    public Consumer<Event> recommendations() {
+    public Consumer<Event> reviews() {
         return event -> {
             LOG.info("Process message created at {}...", event.getEventCreatedAt());
             switch (event.getEventType()) {

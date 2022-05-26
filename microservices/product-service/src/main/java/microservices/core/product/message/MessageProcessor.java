@@ -19,11 +19,12 @@ public class MessageProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(MessageProcessor.class);
 
     private final ProductService productService;
-    
+
     // products-in-0
     @Bean
     public Consumer<Event> products() {
         return event -> {
+            LOG.info("event : {}", event.getClass());
             LOG.info("Process message created at {}...", event.getEventCreatedAt());
             switch (event.getEventType()) {
                 case CREATE:
