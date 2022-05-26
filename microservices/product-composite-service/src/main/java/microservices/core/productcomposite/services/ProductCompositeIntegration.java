@@ -15,8 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,8 +33,11 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static microservices.api.event.Event.Type.CREATE;
+import static microservices.api.event.Event.Type.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static reactor.core.publisher.Flux.empty;
 
@@ -44,14 +53,13 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     private final String recommendationServiceUrl;
     private final String reviewServiceUrl;
     
-    @Autowired
-    private StreamBridge streamBridge;
-    
+    // for functional
+    private final StreamBridge streamBridge;
 
     @Autowired
     public ProductCompositeIntegration(
             ObjectMapper mapper,
-
+            StreamBridge streamBridge,
             @Value("${app.product-service.host}") String productServiceHost,
             @Value("${app.product-service.port}") int    productServicePort,
 
@@ -63,17 +71,21 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
         this.webClient = WebClient.builder().build();
         this.mapper = mapper;
+        
+        // for function
+        this.streamBridge = streamBridge;
 
         productServiceUrl        = "http://" + productServiceHost + ":" + productServicePort + "/product/";
         recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort + "/recommendation";
         reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review";
     }
     
-    
     // Product
     @Override
     public Mono<ProductDTO> getProduct(int productId) {
         String url = productServiceUrl + "/" + productId;
+        LOG.debug("Will call the getProduct API on URL: {}", url);
+
         return webClient.get()
                 .uri(url)
                 .retrieve()
@@ -88,13 +100,13 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     
     @Override
     public ProductDTO createProduct(ProductDTO body) {
-        streamBridge.send("product-out-0", new Event(CREATE, body.getProductId(), body));
+        streamBridge.send("products-out-0", new Event(CREATE, body.getProductId(), body));
         return body;
     }
 
     @Override
     public void deleteProduct(int productId) {
-        streamBridge.send("product-out-0", new Event(CREATE, productId, null));
+        streamBridge.send("products-out-0", new Event(CREATE, productId, null));
     }
 
     
@@ -102,7 +114,6 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     @Override
     public Flux<RecommendationDTO> getRecommendations(int productId) {
         String url = recommendationServiceUrl + "?productId=" + productId;
-
         LOG.debug("Will call the getRecommendations API on URL: {}", url);
 
         return webClient.get()
@@ -110,49 +121,17 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
                 .retrieve().bodyToFlux(RecommendationDTO.class)
                 .log()
                 .onErrorResume(e -> empty());
-        
-        try {
-
-            LOG.debug("Will call the getRecommendations API on URL: {}", url);
-            List<RecommendationDTO> recommendations = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<List<RecommendationDTO>>() {}).getBody();
-
-            LOG.debug("Found {} recommendations for a product with id: {}", recommendations.size(), productId);
-            return recommendations;
-
-        } catch (Exception ex) {
-            LOG.warn("Got an exception while requesting recommendations, return zero recommendations: {}", ex.getMessage());
-            return new ArrayList<>();
-        }
     }
-    
+
     @Override
     public RecommendationDTO createRecommendation(RecommendationDTO body) {
-
-        try {
-            String url = recommendationServiceUrl;
-            LOG.debug("Will post a new recommendation to URL: {}", url);
-
-            RecommendationDTO recommendation = restTemplate.postForObject(url, body, RecommendationDTO.class);
-            LOG.debug("Created a recommendation with id: {}", recommendation.getProductId());
-
-            return recommendation;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        streamBridge.send("recommendations-out-0", new Event(CREATE, body.getProductId(), body));
+        return body;
     }
 
     @Override
     public void deleteRecommendations(int productId) {
-        try {
-            String url = recommendationServiceUrl + "?productId=" + productId;
-            LOG.debug("Will call the deleteRecommendations API on URL: {}", url);
-
-            restTemplate.delete(url);
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        streamBridge.send("recommendations-out-0", new Event(DELETE, productId, null));
     }
 
     
@@ -168,33 +147,35 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     @Override
     public ReviewDTO createReview(ReviewDTO body) {
-        try {
-            String url = reviewServiceUrl;
-            LOG.debug("Will post a new review to URL: {}", url);
-
-            ReviewDTO review = restTemplate.postForObject(url, body, ReviewDTO.class);
-            LOG.debug("Created a review with id: {}", review.getProductId());
-
-            return review;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        streamBridge.send("reviews-out-0", new Event(CREATE, body.getProductId(), body));
+        return body;
     }
 
     @Override
     public void deleteReviews(int productId) {
-        try {
-            String url = reviewServiceUrl + "?productId=" + productId;
-            LOG.debug("Will call the deleteReviews API on URL: {}", url);
-
-            restTemplate.delete(url);
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        streamBridge.send("reviews-out-0", new Event(DELETE, productId, null));
     }
 
+    public Mono<Health> getProductHealth() {
+        return getHealth(productServiceUrl);
+    }
+
+    public Mono<Health> getRecommendationHealth() {
+        return getHealth(recommendationServiceUrl);
+    }
+
+    public Mono<Health> getReviewHealth() {
+        return getHealth(reviewServiceUrl);
+    }
+
+    public Mono<Health> getHealth(String url) {
+        url += "/actuator/health";
+        LOG.debug("Will call the Health API on URL: {}", url);
+        return webClient.get().uri(url).retrieve()
+                .bodyToMono(String.class)
+                .map(s -> new Health.Builder().up().build())
+                .onErrorResume(ex -> Mono.just(new Health.Builder().down().build()));
+    }
 
 
     private String getErrorMessage(WebClientResponseException ex) {

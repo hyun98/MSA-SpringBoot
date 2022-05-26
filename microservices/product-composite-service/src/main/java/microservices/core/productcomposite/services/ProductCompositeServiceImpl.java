@@ -35,7 +35,6 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
     public void createCompositeProduct(ProductAggregate body) {
 
         try {
-
             LOG.debug("createCompositeProduct: creates a new composite entity for productId: {}", body.getProductId());
             
             ProductDTO product = new ProductDTO(body.getProductId(), body.getName(), body.getWeight(), null);
@@ -47,7 +46,6 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
                     integration.createRecommendation(recommendation);
                 });
             }
-
             if (body.getReviews() != null) {
                 body.getReviews().forEach(r -> {
                     ReviewDTO review = new ReviewDTO(body.getProductId(), r.getReviewId(), r.getAuthor(), r.getSubject(), r.getContent(), null);

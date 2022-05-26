@@ -52,8 +52,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO createProduct(ProductDTO body) {
         if (body.getProductId() < 1) throw new InvalidInputException("Invalid productId: " + body.getProductId());
-
+        LOG.info("createProduct 호출");
+        
         ProductEntity entity = mapper.DTOToEntity(body);
+        System.out.println(entity);
         Mono<ProductDTO> newEntity = productRepository.save(entity)
                 .log()
                 .onErrorMap(
