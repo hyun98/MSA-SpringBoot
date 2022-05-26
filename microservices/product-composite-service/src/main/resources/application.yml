@@ -20,7 +20,7 @@ api:
         2. Reviews
         3. Recommendations
         4. Service Address (No prod)
-        
+
         # Exception
         1. Product X : 404
         2. No reviews, recommendations : continue
@@ -29,10 +29,10 @@ api:
       notes: |
         # Normal
         Create product
-        
+
         # Exception
         1. productId 중복 : 422 - Unprocessable Entity (duplicate key)
-    
+
     delete-composite-product:
       description: 상품 삭제
       notes: |
@@ -67,38 +67,45 @@ spring:
       "docker": "docker"
   rabbitmq:
     host: 127.0.0.1
-      port: 5672
-      username: guest
-      password: guest
+    port: 5672
+    username: guest
+    password: guest
+
   cloud:
     function:
-      definition: products;recommendations;reviews
-      
+      definition: products;recommendations;reviews;
     stream:
       kafka:
         binder:
           brokers: 127.0.0.1
           defaultBrokerPort: 9092
-          
       defaultBinder: rabbit
-      
       default:
         contentType: application/json
-        
       bindings:
         products-out-0:
           destination: products
-          producer:
-            required-groups: auditGroup
+#          producer:
+#            required-groups: auditGroup
         recommendations-out-0:
           destination: recommendations
-          producer:
-            required-groups: auditGroup
+#          producer:
+#            required-groups: auditGroup
         reviews-out-0:
           destination: reviews
-          producer:
-            required-groups: auditGroup
+#          producer:
+#            required-groups: auditGroup
 
+#management:
+#  endpoints:
+#    web:
+#      base-path: /actuator
+#      path-mapping:
+#        health: health
+#      health:
+#        show-details: always
+#management.endpoint.health.show-details: "ALWAYS"
+#management.endpoints.web.exposure.include: "*"
 ---
 spring:
   config:
@@ -111,7 +118,7 @@ spring:
       kafka:
         binder:
           brokers: kafka
-      
+
 server:
   port: 8080
 

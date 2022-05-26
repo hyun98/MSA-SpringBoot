@@ -1,4 +1,5 @@
-server.port: 7002
+server:
+  port: 7002
 
 logging:
   level:
@@ -16,6 +17,37 @@ spring:
   profiles:
     group:
       "docker": "docker"
+      
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+  cloud:
+    function:
+      definition: recommendations
+    stream:
+      rabbit:
+        bindings:
+          input:
+            consumer:
+              autoBindDlq: true
+              republishToDlq: true
+      default-binder: rabbit
+      default:
+        contentType: application/json
+      bindings:
+        recommendations-in-0:
+          destination: recommendations
+          group: recommendationsGroup
+      kafka:
+        binder:
+          brokers: 127.0.0.1
+          defaultBrokerPort: 9092
+
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
 
 ---
 spring:
@@ -25,6 +57,14 @@ spring:
   data:
     mongodb:
       host: mongodb
+  rabbitmq:
+    host: rabbitmq
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: kafka
+  
 server:
   port: 8080
 

@@ -7,7 +7,6 @@ logging:
     microservices.core: DEBUG
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
-
 spring:
   data:
     mongodb:
@@ -15,44 +14,55 @@ spring:
       port: 27017
       database: product-db
       auto-index-creation: true
-      
   profiles:
     group: 
       "docker": "docker"
-      
+  
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    
   cloud:
+    function:
+      definition: products;
     stream:
       rabbit:
         bindings:
           input:
             consumer:
-              autoBindDlq: true
-              republishToDlq: true
-      kafka:
-        bindings:
-          input:
-            consumer:
-              enableDlq: true
+              autoBindlq: true
+      default-binder: rabbit
+      default:
+        contentType: application/json
       bindings:
-        input:
+        products-in-0:
           destination: products
-          group: productsGroup
-          consumer:
-            partitioned: true
-            instance-index: 0
-            maxAttempts: 3
-            backOffInitialInterval: 500
-            backOffMaxInterval: 1000
-            backOffMultiplier: 2.0
+#          group: productsGroup
+      kafka:
+        binder:
+          brokers: 127.0.0.1
+          defaultBrokerPort: 9092
 
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
 ---
 spring:
-  data:
-    mongodb:
-      host: mongodb
   config:
     activate:
       on-profile: "docker"
+  data:
+    mongodb:
+      host: mongodb
+  rabbitmq:
+    host: rabbitmq
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: kafka
+  
 server:
   port: 8080
 

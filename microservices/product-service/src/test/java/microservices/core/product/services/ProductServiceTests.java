@@ -1,5 +1,6 @@
 package microservices.core.product.services;
 
+import microservices.api.core.product.ProductService;
 import microservices.api.core.product.dto.ProductDTO;
 import microservices.core.product.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static reactor.core.publisher.Mono.just;
 
+
 @SpringBootTest(webEnvironment=RANDOM_PORT)
 class ProductServiceTests {
 
@@ -34,15 +36,14 @@ class ProductServiceTests {
 
 	@Test
 	public void getProductById() {
-
 		int productId = 1;
 
 		assertNull(productRepository.findByProductId(productId).block());
-		assertEquals(0, (long)productRepository.count().block());
+		assertEquals(0, productRepository.count().block());
 
 		postAndVerifyProduct(productId, OK);
 
-		assertTrue(productRepository.findByProductId(productId).isPresent());
+		assertNotNull(productRepository.findByProductId(productId).block());
 
 		getAndVerifyProduct(productId, OK)
 				.jsonPath("$.productId").isEqualTo(productId);
@@ -68,9 +69,11 @@ class ProductServiceTests {
 	public void duplicateError() {
 		int productId = 1;
 
+		assertNull(productRepository.findByProductId(productId).block());
+
 		postAndVerifyProduct(productId, OK);
 
-		assertTrue(productRepository.findByProductId(productId).isPresent());
+		assertNotNull(productRepository.findByProductId(productId).block());
 
 		postAndVerifyProduct(productId, UNPROCESSABLE_ENTITY)
 				.jsonPath("$.path").isEqualTo("/product")
@@ -78,15 +81,15 @@ class ProductServiceTests {
 	}
 
 	@Test
-	@DisplayName("DELETE 멱등성")
+	@DisplayName("DELETE 멱등성 체크")
 	public void deleteProduct() {
 		int productId = 1;
 
 		postAndVerifyProduct(productId, OK);
-		assertTrue(productRepository.findByProductId(productId).isPresent());
+		assertNotNull(productRepository.findByProductId(productId).block());
 
 		deleteAndVerifyProduct(productId, OK);
-		assertFalse(productRepository.findByProductId(productId).isPresent());
+		assertNull(productRepository.findByProductId(productId).block());
 
 		deleteAndVerifyProduct(productId, OK);
 	}
@@ -109,10 +112,10 @@ class ProductServiceTests {
 
 	private BodyContentSpec postAndVerifyProduct(int productId, HttpStatus expectedStatus) {
 		ProductDTO product = new ProductDTO(productId, "Name " + productId, productId, "SA");
-
 		return client.post()
 				.uri("/product")
 				.body(just(product), ProductDTO.class)
+//				.body(BodyInserters.fromValue(product))
 				.accept(APPLICATION_JSON)
 				.exchange()
 				.expectStatus().isEqualTo(expectedStatus)
