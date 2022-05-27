@@ -1,5 +1,6 @@
 package microservices.core.review.message;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import microservices.api.core.review.ReviewService;
 import microservices.api.core.review.dto.ReviewDTO;
@@ -19,6 +20,8 @@ public class MessageProcessor {
 
     private final ReviewService reviewService;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     // review-in-0
     @Bean
     public Consumer<Event> reviews() {
@@ -26,13 +29,13 @@ public class MessageProcessor {
             LOG.info("Process message created at {}...", event.getEventCreatedAt());
             switch (event.getEventType()) {
                 case CREATE:
-                    ReviewDTO review = (ReviewDTO) event.getData();
+                    ReviewDTO review = objectMapper.convertValue(event.getData(), ReviewDTO.class);
                     LOG.info("Create Review with ID: {}", review.getProductId());
                     reviewService.createReview(review);
                     break;
 
                 case DELETE:
-                    int productId = (int) event.getKey();
+                    int productId = objectMapper.convertValue(event.getKey(), int.class);
                     LOG.info("Delete recommendations with ProductID: {}", productId);
                     reviewService.deleteReviews(productId);
                     break;

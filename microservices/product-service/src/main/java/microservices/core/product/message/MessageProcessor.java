@@ -1,5 +1,6 @@
 package microservices.core.product.message;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import microservices.api.core.product.ProductService;
 import microservices.api.core.product.dto.ProductDTO;
@@ -20,21 +21,23 @@ public class MessageProcessor {
 
     private final ProductService productService;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     // products-in-0
     @Bean
     public Consumer<Event> products() {
         return event -> {
-            LOG.info("event : {}", event.getClass());
             LOG.info("Process message created at {}...", event.getEventCreatedAt());
+            LOG.info("Event data: {}", event.getData());
             switch (event.getEventType()) {
                 case CREATE:
-                    ProductDTO product = (ProductDTO) event.getData();
+                    ProductDTO product = objectMapper.convertValue(event.getData(), ProductDTO.class);
                     LOG.info("Create product with ID: {}", product.getProductId());
                     productService.createProduct(product);
                     break;
 
                 case DELETE:
-                    int productId = (int) event.getKey();
+                    int productId = objectMapper.convertValue(event.getKey(), int.class);
                     LOG.info("Delete recommendations with ProductID: {}", productId);
                     productService.deleteProduct(productId);
                     break;

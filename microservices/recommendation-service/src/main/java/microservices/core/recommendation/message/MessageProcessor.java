@@ -1,5 +1,6 @@
 package microservices.core.recommendation.message;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import microservices.api.core.product.ProductService;
 import microservices.api.core.product.dto.ProductDTO;
@@ -22,6 +23,8 @@ public class MessageProcessor {
 
     private final RecommendationService recommendationService;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     // recommendations-in-0
     @Bean
     public Consumer<Event> recommendations() {
@@ -29,13 +32,14 @@ public class MessageProcessor {
             LOG.info("Process message created at {}...", event.getEventCreatedAt());
             switch (event.getEventType()) {
                 case CREATE:
-                    RecommendationDTO recommendation = (RecommendationDTO) event.getData();
+
+                    RecommendationDTO recommendation = objectMapper.convertValue(event.getData(), RecommendationDTO.class);
                     LOG.info("Create Recommendation with ID: {}", recommendation.getProductId());
                     recommendationService.createRecommendation(recommendation);
                     break;
 
                 case DELETE:
-                    int productId = (int) event.getKey();
+                    int productId = objectMapper.convertValue(event.getKey(), int.class);
                     LOG.info("Delete recommendations with ProductID: {}", productId);
                     recommendationService.deleteRecommendations(productId);
                     break;
