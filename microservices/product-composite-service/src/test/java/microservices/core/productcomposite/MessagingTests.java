@@ -49,7 +49,7 @@
 //
 //    @Autowired
 //    private StreamBridge streamBridge;
-//    
+//
 //    @Autowired
 //    private MessageCollector collector;
 //
@@ -59,7 +59,7 @@
 //
 //    @BeforeEach
 //    public void setUp() {
-//        
+//
 //    }
 //
 //    @Test

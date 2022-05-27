@@ -28,18 +28,19 @@ spring:
     function:
       definition: products;
     stream:
-      rabbit:
-        bindings:
-          input:
-            consumer:
-              autoBindlq: true
       default-binder: rabbit
       default:
         contentType: application/json
       bindings:
         products-in-0:
           destination: products
-#          group: productsGroup
+          group: productsGroup
+      rabbit:
+        bindings:
+          input:
+            consumer:
+              autoBindDlq: true
+              republishToDlq: true
       kafka:
         binder:
           brokers: 127.0.0.1

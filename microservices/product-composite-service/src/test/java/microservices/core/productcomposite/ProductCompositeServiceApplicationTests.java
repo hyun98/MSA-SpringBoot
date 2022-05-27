@@ -55,49 +55,49 @@ class ProductCompositeServiceApplicationTests {
 		when(compositeIntegration.getProduct(PRODUCT_ID_INVALID)).thenThrow(new InvalidInputException("INVALID: " + PRODUCT_ID_INVALID));
 	}
 
-//	@Test
-//	public void createCompositeProduct1() {
-//		RecommendationDTO recommendationDTO = new RecommendationDTO(1, 1, "a", 1, "c", null);
-//		List<RecommendationDTO> recommendationDTOList = new ArrayList<>();
-//		recommendationDTOList.add(recommendationDTO);
-//
-//		ReviewDTO reviewDTO = new ReviewDTO(1, 1, "a", "s", "c", null);
-//		List<ReviewDTO> reviewDTOList = new ArrayList<>();
-//		reviewDTOList.add(reviewDTO);
-//
-//		ProductAggregate compositeProduct = new ProductAggregate(1, "name", 1,
-//				recommendationDTOList, reviewDTOList, null);
-//		
-//		postAndVerifyProduct(compositeProduct, OK);
-//	}
-//
-//	@Test
-//	public void createCompositeProduct2() {
-//		RecommendationDTO recommendationDTO = new RecommendationDTO(1, 1, "a", 1, "c", null);
-//		List<RecommendationDTO> recommendationDTOList = new ArrayList<>();
-//		recommendationDTOList.add(recommendationDTO);
-//		
-//		ReviewDTO reviewDTO = new ReviewDTO(1, 1, "a", "s", "c", null);
-//		List<ReviewDTO> reviewDTOList = new ArrayList<>();
-//		reviewDTOList.add(reviewDTO);
-//
-//		ProductAggregate compositeProduct = new ProductAggregate(1, "name", 1,
-//				recommendationDTOList, reviewDTOList, null);
-//
-//		postAndVerifyProduct(compositeProduct, OK);
-//	}
-//
-//	@Test
-//	public void deleteCompositeProduct() {
-//		ProductAggregate compositeProduct = new ProductAggregate(1, "name", 1,
-//				singletonList(new RecommendationDTO(1, 1, "a", 1, "c", null)),
-//				singletonList(new ReviewDTO(1, 1, "a", "s", "c", null)), null);
-//		
-//		postAndVerifyProduct(compositeProduct, OK);
-//
-//		deleteAndVerifyProduct(compositeProduct.getProductId(), OK);
-//		deleteAndVerifyProduct(compositeProduct.getProductId(), OK);
-//	}
+	@Test
+	public void createCompositeProduct1() {
+		RecommendationDTO recommendationDTO = new RecommendationDTO(1, 1, "a", 1, "c", null);
+		List<RecommendationDTO> recommendationDTOList = new ArrayList<>();
+		recommendationDTOList.add(recommendationDTO);
+
+		ReviewDTO reviewDTO = new ReviewDTO(1, 1, "a", "s", "c", null);
+		List<ReviewDTO> reviewDTOList = new ArrayList<>();
+		reviewDTOList.add(reviewDTO);
+
+		ProductAggregate compositeProduct = new ProductAggregate(1, "name", 1,
+				recommendationDTOList, reviewDTOList, null);
+
+		postAndVerifyProduct(compositeProduct, OK);
+	}
+
+	@Test
+	public void createCompositeProduct2() {
+		RecommendationDTO recommendationDTO = new RecommendationDTO(1, 1, "a", 1, "c", null);
+		List<RecommendationDTO> recommendationDTOList = new ArrayList<>();
+		recommendationDTOList.add(recommendationDTO);
+
+		ReviewDTO reviewDTO = new ReviewDTO(1, 1, "a", "s", "c", null);
+		List<ReviewDTO> reviewDTOList = new ArrayList<>();
+		reviewDTOList.add(reviewDTO);
+
+		ProductAggregate compositeProduct = new ProductAggregate(1, "name", 1,
+				recommendationDTOList, reviewDTOList, null);
+
+		postAndVerifyProduct(compositeProduct, OK);
+	}
+
+	@Test
+	public void deleteCompositeProduct() {
+		ProductAggregate compositeProduct = new ProductAggregate(1, "name", 1,
+				singletonList(new RecommendationDTO(1, 1, "a", 1, "c", null)),
+				singletonList(new ReviewDTO(1, 1, "a", "s", "c", null)), null);
+
+		postAndVerifyProduct(compositeProduct, OK);
+
+		deleteAndVerifyProduct(compositeProduct.getProductId(), OK);
+		deleteAndVerifyProduct(compositeProduct.getProductId(), OK);
+	}
 
 	@Test
 	public void getProductById() {

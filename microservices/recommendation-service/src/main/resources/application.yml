@@ -28,12 +28,6 @@ spring:
     function:
       definition: recommendations
     stream:
-      rabbit:
-        bindings:
-          input:
-            consumer:
-              autoBindDlq: true
-              republishToDlq: true
       default-binder: rabbit
       default:
         contentType: application/json
@@ -41,6 +35,12 @@ spring:
         recommendations-in-0:
           destination: recommendations
           group: recommendationsGroup
+      rabbit:
+        bindings:
+          input:
+            consumer:
+              autoBindDlq: true
+              republishToDlq: true
       kafka:
         binder:
           brokers: 127.0.0.1

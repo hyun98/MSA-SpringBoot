@@ -197,12 +197,6 @@ setupTestdata
 waitForMessageProcessing
 
 # Verify that a normal request works, expect three recommendations and three reviews
-assertCurl 200 "curl http://$HOST:$PORT/product-composite/1 -s"
-assertEqual 1 $(echo $RESPONSE | jq .productId)
-assertEqual 3 $(echo $RESPONSE | jq ".recommendations | length")
-assertEqual 3 $(echo $RESPONSE | jq ".reviews | length")
-
-# Verify that a normal request works, expect three recommendations and three reviews
 assertCurl 200 "curl http://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS -s"
 assertEqual "$PROD_ID_REVS_RECS" $(echo $RESPONSE | jq .productId)
 assertEqual 3 $(echo $RESPONSE | jq ".recommendations | length")

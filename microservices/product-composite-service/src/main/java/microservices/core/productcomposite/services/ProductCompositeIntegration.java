@@ -106,7 +106,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     @Override
     public void deleteProduct(int productId) {
-        streamBridge.send("products-out-0", new Event(CREATE, productId, null));
+        streamBridge.send("products-out-0", new Event(DELETE, productId, null));
     }
 
     
