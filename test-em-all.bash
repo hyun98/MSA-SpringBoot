@@ -111,7 +111,7 @@ function waitForMessageProcessing() {
     echo "Wait for messages to be processed... "
 
     # Give background processing some time to complete...
-    sleep 1
+    sleep 10
 
     n=0
     until testCompositeCreated
