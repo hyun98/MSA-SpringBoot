@@ -14,6 +14,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.concurrent.Executors;
 
+//@EnableDiscoveryClient
 @SpringBootApplication
 @ComponentScan("microservices")
 public class ReviewServiceApplication {

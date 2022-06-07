@@ -46,47 +46,34 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeIntegration.class);
 
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
+    private WebClient webClient;
+    
     private final ObjectMapper mapper;
 
-    private final String productServiceUrl;
-    private final String recommendationServiceUrl;
-    private final String reviewServiceUrl;
+    private final String productServiceUrl = "http://product";
+    private final String recommendationServiceUrl = "http://recommendation";
+    private final String reviewServiceUrl = "http://review";
     
     // for functional
     private final StreamBridge streamBridge;
 
     @Autowired
-    public ProductCompositeIntegration(
-            ObjectMapper mapper,
-            StreamBridge streamBridge,
-            @Value("${app.product-service.host}") String productServiceHost,
-            @Value("${app.product-service.port}") int    productServicePort,
-
-            @Value("${app.recommendation-service.host}") String recommendationServiceHost,
-            @Value("${app.recommendation-service.port}") int    recommendationServicePort,
-
-            @Value("${app.review-service.host}") String reviewServiceHost,
-            @Value("${app.review-service.port}") int    reviewServicePort) {
-
-        this.webClient = WebClient.builder().build();
+    public ProductCompositeIntegration(WebClient.Builder webClientBuilder, ObjectMapper mapper, StreamBridge streamBridge) {
+        this.webClientBuilder = webClientBuilder;
         this.mapper = mapper;
         
-        // for function
+        // for functional bridge
         this.streamBridge = streamBridge;
-
-        productServiceUrl        = "http://" + productServiceHost + ":" + productServicePort + "/product/";
-        recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort + "/recommendation";
-        reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review";
     }
     
     // Product
     @Override
     public Mono<ProductDTO> getProduct(int productId) {
-        String url = productServiceUrl + "/" + productId;
+        String url = productServiceUrl + "/product/" + productId;
         LOG.debug("Will call the getProduct API on URL: {}", url);
 
-        return webClient.get()
+        return getWebClient().get()
                 .uri(url)
                 .retrieve()
                 .bodyToMono(ProductDTO.class)
@@ -113,10 +100,10 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     // Recommendation
     @Override
     public Flux<RecommendationDTO> getRecommendations(int productId) {
-        String url = recommendationServiceUrl + "?productId=" + productId;
+        String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
         LOG.debug("Will call the getRecommendations API on URL: {}", url);
 
-        return webClient.get()
+        return getWebClient().get()
                 .uri(url)
                 .retrieve().bodyToFlux(RecommendationDTO.class)
                 .log()
@@ -138,10 +125,10 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     // Review
     @Override
     public Flux<ReviewDTO> getReviews(int productId) {
-        String url = reviewServiceUrl + "?productId=" + productId;
+        String url = reviewServiceUrl + "/review?productId=" + productId;
         LOG.debug("Will call the getReviews API on URL: {}", url);
 
-        return webClient.get().uri(url).retrieve()
+        return getWebClient().get().uri(url).retrieve()
                 .bodyToFlux(ReviewDTO.class).onErrorResume(error -> empty());
     }
 
@@ -171,12 +158,18 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     public Mono<Health> getHealth(String url) {
         url += "/actuator/health";
         LOG.debug("Will call the Health API on URL: {}", url);
-        return webClient.get().uri(url).retrieve()
+        return getWebClient().get().uri(url).retrieve()
                 .bodyToMono(String.class)
                 .map(s -> new Health.Builder().up().build())
                 .onErrorResume(ex -> Mono.just(new Health.Builder().down().build()));
     }
 
+    private WebClient getWebClient() {
+        if (webClient == null) {
+            webClient = webClientBuilder.build();
+        }
+        return webClient;
+    }
 
     private String getErrorMessage(WebClientResponseException ex) {
         try {

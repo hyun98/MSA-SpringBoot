@@ -23,7 +23,6 @@ services:
       rabbitmq:
         condition: service_healthy
       
-
   review:
     build: microservices/review-service
     mem_limit: 350m
@@ -77,7 +76,7 @@ services:
       - MYSQL_USER=user
       - MYSQL_PASSWORD=1234
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-uuser", "-p1234", "-h", "localhost" ]
+      test: "/usr/bin/mysql -uuser -p1234 --execute \"SHOW DATABASES;\""
       interval: 10s
       timeout: 5s
       retries: 10
