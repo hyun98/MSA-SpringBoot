@@ -60,6 +60,7 @@ logging:
   level:
     root: INFO
     microservices.core: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
 spring:
   profiles:
