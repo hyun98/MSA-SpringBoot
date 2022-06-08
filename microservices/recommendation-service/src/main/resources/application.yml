@@ -12,7 +12,7 @@ spring:
     mongodb:
       host: localhost
       port: 27017
-      database: recommendation-db
+      database: recommendation
       auto-index-creation: true
   profiles:
     group:

@@ -55,7 +55,6 @@ spring:
           brokers: 127.0.0.1
           defaultBrokerPort: 9092
 
-
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
 
@@ -76,14 +75,13 @@ spring:
       on-profile: "docker"
   datasource:
     url: jdbc:mysql://mysql:3306/review-db
-    username: user
-    password: 1234
-    hikari:
-      initialization-fail-timeout: 60000
-
-spring.rabbitmq.host: rabbitmq
-
-spring.cloud.stream.kafka.binder.brokers: kafka
+  rabbitmq:
+    host: rabbitmq
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: kafka
 
 server:
   port: 8080

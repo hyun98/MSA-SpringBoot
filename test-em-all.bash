@@ -189,8 +189,6 @@ fi
 
 waitForService curl http://$HOST:$PORT/actuator/health
 
-sleep 10
-
 setupTestdata
 
 waitForMessageProcessing

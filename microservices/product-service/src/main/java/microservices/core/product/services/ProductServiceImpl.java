@@ -11,6 +11,7 @@ import microservices.util.http.ServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -55,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
         LOG.info("createProduct 호출");
         
         ProductEntity entity = mapper.DTOToEntity(body);
-        System.out.println(entity);
+        LOG.info("entity product ID : {}", entity.getProductId());
         Mono<ProductDTO> newEntity = productRepository.save(entity)
                 .log()
                 .onErrorMap(
