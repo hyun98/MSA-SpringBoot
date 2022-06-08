@@ -30,13 +30,13 @@ public class MessageProcessor {
             switch (event.getEventType()) {
                 case CREATE:
                     ReviewDTO review = objectMapper.convertValue(event.getData(), ReviewDTO.class);
-                    LOG.info("Create Review with ID: {}", review.getProductId());
+                    LOG.info("Create Review with productID: {}", review.getProductId());
                     reviewService.createReview(review);
                     break;
 
                 case DELETE:
                     int productId = objectMapper.convertValue(event.getKey(), int.class);
-                    LOG.info("Delete recommendations with ProductID: {}", productId);
+                    LOG.info("Delete review with ProductID: {}", productId);
                     reviewService.deleteReviews(productId);
                     break;
 

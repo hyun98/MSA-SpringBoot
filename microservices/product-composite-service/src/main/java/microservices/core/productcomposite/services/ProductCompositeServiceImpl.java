@@ -23,20 +23,14 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
     private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeServiceImpl.class);
 
     private final ServiceUtil serviceUtil;
-    private  ProductCompositeIntegration integration;
-
-    @Autowired
-    public ProductCompositeServiceImpl(ServiceUtil serviceUtil, ProductCompositeIntegration integration) {
-        this.serviceUtil = serviceUtil;
-        this.integration = integration;
-    }
+    private final ProductCompositeIntegration integration;
 
     @Override
     public void createCompositeProduct(ProductAggregate body) {
 
         try {
             LOG.debug("createCompositeProduct: creates a new composite entity for productId: {}", body.getProductId());
-            
+            LOG.debug("ProductAggregate body : {}", body);
             ProductDTO product = new ProductDTO(body.getProductId(), body.getName(), body.getWeight(), null);
             integration.createProduct(product);
 

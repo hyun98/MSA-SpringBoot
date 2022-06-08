@@ -52,7 +52,6 @@ services:
     
   mongodb:
     image: arm64v8/mongo:4.0
-#    platform: "linux/x86_64"
     mem_limit: 350m
     ports:
       - "27017:27017"

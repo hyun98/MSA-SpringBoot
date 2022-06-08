@@ -46,25 +46,40 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeIntegration.class);
 
-    private final WebClient.Builder webClientBuilder;
-    private WebClient webClient;
+    private final WebClient webClient;
     
     private final ObjectMapper mapper;
 
-    private final String productServiceUrl = "http://product";
-    private final String recommendationServiceUrl = "http://recommendation";
-    private final String reviewServiceUrl = "http://review";
+    private final String productServiceUrl;
+    private final String recommendationServiceUrl;
+    private final String reviewServiceUrl;
     
     // for functional
     private final StreamBridge streamBridge;
 
     @Autowired
-    public ProductCompositeIntegration(WebClient.Builder webClientBuilder, ObjectMapper mapper, StreamBridge streamBridge) {
-        this.webClientBuilder = webClientBuilder;
+    public ProductCompositeIntegration(
+            WebClient.Builder webClient,
+            ObjectMapper mapper,
+            StreamBridge streamBridge,
+
+            @Value("${app.product-service.host}") String productServiceHost,
+            @Value("${app.product-service.port}") int    productServicePort,
+
+            @Value("${app.recommendation-service.host}") String recommendationServiceHost,
+            @Value("${app.recommendation-service.port}") int    recommendationServicePort,
+
+            @Value("${app.review-service.host}") String reviewServiceHost,
+            @Value("${app.review-service.port}") int    reviewServicePort
+    ) {
+
+        this.webClient = webClient.build();
         this.mapper = mapper;
-        
-        // for functional bridge
         this.streamBridge = streamBridge;
+        
+        productServiceUrl        = "http://" + productServiceHost + ":" + productServicePort;
+        recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort;
+        reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort;
     }
     
     // Product
@@ -73,7 +88,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         String url = productServiceUrl + "/product/" + productId;
         LOG.debug("Will call the getProduct API on URL: {}", url);
 
-        return getWebClient().get()
+        return webClient.get()
                 .uri(url)
                 .retrieve()
                 .bodyToMono(ProductDTO.class)
@@ -103,7 +118,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
         LOG.debug("Will call the getRecommendations API on URL: {}", url);
 
-        return getWebClient().get()
+        return webClient.get()
                 .uri(url)
                 .retrieve().bodyToFlux(RecommendationDTO.class)
                 .log()
@@ -128,7 +143,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         String url = reviewServiceUrl + "/review?productId=" + productId;
         LOG.debug("Will call the getReviews API on URL: {}", url);
 
-        return getWebClient().get().uri(url).retrieve()
+        return webClient.get().uri(url).retrieve()
                 .bodyToFlux(ReviewDTO.class).onErrorResume(error -> empty());
     }
 
@@ -158,17 +173,10 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     public Mono<Health> getHealth(String url) {
         url += "/actuator/health";
         LOG.debug("Will call the Health API on URL: {}", url);
-        return getWebClient().get().uri(url).retrieve()
+        return webClient.get().uri(url).retrieve()
                 .bodyToMono(String.class)
                 .map(s -> new Health.Builder().up().build())
                 .onErrorResume(ex -> Mono.just(new Health.Builder().down().build()));
-    }
-
-    private WebClient getWebClient() {
-        if (webClient == null) {
-            webClient = webClientBuilder.build();
-        }
-        return webClient;
     }
 
     private String getErrorMessage(WebClientResponseException ex) {

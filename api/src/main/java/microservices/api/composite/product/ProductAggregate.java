@@ -6,7 +6,7 @@ import microservices.api.core.review.dto.ReviewDTO;
 
 import java.util.List;
 
-@Data
+@Getter
 @RequiredArgsConstructor
 public class ProductAggregate {
     private final int productId;
@@ -15,7 +15,7 @@ public class ProductAggregate {
     private final List<RecommendationDTO> recommendations;
     private final List<ReviewDTO> reviews;
     private final ServiceAddresses serviceAddresses;
-
+    
     public ProductAggregate() {
         productId = 0;
         name = null;

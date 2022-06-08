@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #!/usr/bin/env bash
 #
 # ./grdelw clean build
@@ -19,50 +17,50 @@
 
 function assertCurl() {
 
-  local expectedHttpCode=$1
-  local curlCmd="$2 -w \"%{http_code}\""
-  local result=$(eval $curlCmd)
-  local httpCode="${result:(-3)}"
-  RESPONSE='' && (( ${#result} > 3 )) && RESPONSE="${result%???}"
+    local expectedHttpCode=$1
+    local curlCmd="$2 -w \"%{http_code}\""
+    local result=$(eval $curlCmd)
+    local httpCode="${result:(-3)}"
+    RESPONSE='' && (( ${#result} > 3 )) && RESPONSE="${result%???}"
 
-  if [ "$httpCode" = "$expectedHttpCode" ]
-  then
-    if [ "$httpCode" = "200" ]
+    if [ "$httpCode" = "$expectedHttpCode" ]
     then
-      echo "Test OK (HTTP Code: $httpCode)"
+        if [ "$httpCode" = "200" ]
+        then
+            echo "Test OK (HTTP Code: $httpCode)"
+        else
+            echo "Test OK (HTTP Code: $httpCode, $RESPONSE)"
+        fi
+        return 0
     else
-      echo "Test OK (HTTP Code: $httpCode, $RESPONSE)"
+        echo  "Test FAILED, EXPECTED HTTP Code: $expectedHttpCode, GOT: $httpCode, WILL ABORT!"
+        echo  "- Failing command: $curlCmd"
+        echo  "- Response Body: $RESPONSE"
+        return 1
     fi
-  else
-      echo  "Test FAILED, EXPECTED HTTP Code: $expectedHttpCode, GOT: $httpCode, WILL ABORT!"
-      echo  "- Failing command: $curlCmd"
-      echo  "- Response Body: $RESPONSE"
-      exit 1
-  fi
 }
 
 function assertEqual() {
 
-  local expected=$1
-  local actual=$2
+    local expected=$1
+    local actual=$2
 
-  if [ "$actual" = "$expected" ]
-  then
-    echo "Test OK (actual value: $actual)"
-  else
-    echo "Test FAILED, EXPECTED VALUE: $expected, ACTUAL VALUE: $actual, WILL ABORT"
-    exit 1
-  fi
+    if [ "$actual" = "$expected" ]
+    then
+        echo "Test OK (actual value: $actual)"
+        return 0
+    else
+        echo "Test FAILED, EXPECTED VALUE: $expected, ACTUAL VALUE: $actual, WILL ABORT"
+        return 1
+    fi
 }
 
 function testUrl() {
     url=$@
-    if curl $url -ks -f -o /dev/null
+    if $url -ks -f -o /dev/null
     then
-          echo "Ok"
           return 0
     else
-          echo -n "not yet"
           return 1
     fi;
 }
@@ -79,7 +77,7 @@ function waitForService() {
             echo " Give up"
             exit 1
         else
-            sleep 6
+            sleep 3
             echo -n ", retry #$n "
         fi
     done
@@ -111,7 +109,7 @@ function waitForMessageProcessing() {
     echo "Wait for messages to be processed... "
 
     # Give background processing some time to complete...
-    sleep 10
+    sleep 1
 
     n=0
     until testCompositeCreated
@@ -122,7 +120,7 @@ function waitForMessageProcessing() {
             echo " Give up"
             exit 1
         else
-            sleep 6
+            sleep 3
             echo -n ", retry #$n "
         fi
     done
@@ -169,14 +167,13 @@ function setupTestdata() {
         {"reviewId":2,"author":"author 2","subject":"subject 2","content":"content 2"},
         {"reviewId":3,"author":"author 3","subject":"subject 3","content":"content 3"}
     ]}'
-    recreateComposite 1 "$body"
+    recreateComposite "$PROD_ID_REVS_RECS" "$body"
 
 }
 
-
 set -e
 
-echo "Start:" `date`
+echo "Start Tests:" `date`
 
 echo "HOST=${HOST}"
 echo "PORT=${PORT}"
@@ -190,7 +187,9 @@ then
     docker-compose up -d
 fi
 
-waitForService curl -X DELETE http://$HOST:$PORT/product-composite/13
+waitForService curl http://$HOST:$PORT/actuator/health
+
+sleep 10
 
 setupTestdata
 
@@ -229,9 +228,7 @@ echo "End, all tests OK:" `date`
 
 if [[ $@ == *"stop"* ]]
 then
-    echo "We are done, stopping the test environment..."
-    echo "$ docker-compose down"
-    docker-compose down
+    echo "Stopping the test environment..."
+    echo "$ docker-compose down --remove-orphans"
+    docker-compose down --remove-orphans
 fi
-
-echo "End:" `date`
