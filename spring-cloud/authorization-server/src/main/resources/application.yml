@@ -1,0 +1,15 @@
+server:
+  port: 9000
+  
+spring:
+  profiles:
+    group: 
+      "docker": "docker"
+  application:
+    name: auth-server
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "docker"
