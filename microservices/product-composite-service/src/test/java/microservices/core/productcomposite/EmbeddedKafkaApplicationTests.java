@@ -23,8 +23,10 @@ import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@SpringBootTest
+@SpringBootTest(
+        classes = {EmbeddedKafkaApplicationTests.class, TestSecurityConfig.class })
 @EmbeddedKafka(topics = { EmbeddedKafkaApplicationTests.INPUT_TOPIC, EmbeddedKafkaApplicationTests.OUTPUT_TOPIC },
         partitions = 1,
         bootstrapServersProperty = "spring.kafka.bootstrap-servers")

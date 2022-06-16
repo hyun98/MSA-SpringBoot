@@ -25,10 +25,10 @@ dependencies {
 	implementation project(':api')
 	implementation project(':util')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation ('org.springframework.boot:spring-boot-starter-webflux') {
-		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-reactor-netty'
-	}
-	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
+	implementation ('org.springframework.boot:spring-boot-starter-webflux') 
+//		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-reactor-netty'
+//	}
+//	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
 	implementation "org.springframework.boot:spring-boot-starter-data-mongodb-reactive"
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
