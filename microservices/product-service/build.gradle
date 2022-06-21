@@ -28,7 +28,6 @@ dependencies {
 	implementation ('org.springframework.boot:spring-boot-starter-webflux')
 //		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-reactor-netty'
 //	}
-//	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
 	implementation "org.springframework.boot:spring-boot-starter-data-mongodb-reactive"
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
@@ -50,6 +49,7 @@ dependencies {
 	testImplementation "de.flapdoodle.embed:de.flapdoodle.embed.mongo"
 	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-tomcat'
 }
 
 dependencyManagement {
