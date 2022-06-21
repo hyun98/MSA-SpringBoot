@@ -1,6 +1,5 @@
 package microservices.core.product.services;
 
-import microservices.api.core.product.ProductService;
 import microservices.api.core.product.dto.ProductDTO;
 import microservices.core.product.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;

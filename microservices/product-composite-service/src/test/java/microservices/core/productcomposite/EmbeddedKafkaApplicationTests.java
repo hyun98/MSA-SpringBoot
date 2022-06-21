@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(
-        classes = {EmbeddedKafkaApplicationTests.class, TestSecurityConfig.class })
+        classes = {EmbeddedKafkaApplicationTests.class})
 @EmbeddedKafka(topics = { EmbeddedKafkaApplicationTests.INPUT_TOPIC, EmbeddedKafkaApplicationTests.OUTPUT_TOPIC },
         partitions = 1,
         bootstrapServersProperty = "spring.kafka.bootstrap-servers")
