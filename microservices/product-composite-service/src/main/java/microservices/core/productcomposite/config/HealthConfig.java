@@ -1,7 +1,6 @@
 package microservices.core.productcomposite.config;
 
 import lombok.RequiredArgsConstructor;
-import microservices.core.productcomposite.services.ProductCompositeServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +11,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 
-
 @Component
 @RequiredArgsConstructor
 public class HealthConfig implements HealthIndicator {
-    private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HealthConfig.class);
 
     private final RestTemplate restTemplate;
     private final String productServiceUrl;
@@ -40,19 +38,19 @@ public class HealthConfig implements HealthIndicator {
         reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort;
         this.restTemplate = restTemplate;
     }
-    
+
     @Override
     public Health health() {
         healthCheck(productServiceUrl);
         healthCheck(recommendationServiceUrl);
         healthCheck(reviewServiceUrl);
-        
+
         LOG.info("---- All Services are Running ----");
 
         Health.Builder status = Health.up();
         return status.build();
     }
-    
+
     private void healthCheck(String serviceUrl){
         while (true) {
             String check = restTemplate.getForEntity(
@@ -74,11 +72,11 @@ public class HealthConfig implements HealthIndicator {
     class HealthCheck implements Runnable {
         String serviceHealthString = "";
         final String serviceUrl;
-        
+
         public HealthCheck(String serviceUrl) {
             this.serviceUrl = serviceUrl;
         }
-        
+
         @Override
         public void run() {
             while (true) {
