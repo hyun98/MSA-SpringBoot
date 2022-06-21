@@ -66,6 +66,7 @@ spring:
   profiles:
     group:
       "docker": "docker"
+      "test": "test"
   rabbitmq:
     host: 127.0.0.1
     port: 5672
@@ -131,3 +132,11 @@ app:
   review-service:
     host: review
     port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "test"
+  main:
+    allow-bean-definition-overriding: true

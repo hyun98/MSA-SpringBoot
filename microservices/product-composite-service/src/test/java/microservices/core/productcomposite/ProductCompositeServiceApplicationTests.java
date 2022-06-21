@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 import reactor.core.publisher.Flux;
@@ -31,7 +32,7 @@ import static reactor.core.publisher.Mono.just;
 
 @SpringBootTest(
 	webEnvironment = RANDOM_PORT)
-@Import(TestSecurityConfig.class)
+@ActiveProfiles("test")
 class ProductCompositeServiceApplicationTests {
 	private static final int PRODUCT_ID_OK = 1;
 	private static final int PRODUCT_ID_NOT_FOUND = 2;
