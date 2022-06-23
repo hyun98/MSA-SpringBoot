@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 
+import java.time.Duration;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.*;
@@ -28,6 +30,9 @@ public class RecommendationServiceTests {
 	
 	@BeforeEach
 	public void setupDb() {
+		client = client.mutate()
+				.responseTimeout(Duration.ofSeconds(10))
+				.build();
 		recommendationRepository.deleteAll().block();
 	}
 

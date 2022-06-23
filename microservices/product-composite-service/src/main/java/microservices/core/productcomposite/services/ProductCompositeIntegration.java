@@ -21,6 +21,7 @@ import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -29,8 +30,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -73,7 +76,11 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
             @Value("${app.review-service.port}") int    reviewServicePort
     ) {
 
-        this.webClient = webClient.build();
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofSeconds(10));
+        this.webClient = WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
         this.mapper = mapper;
         this.streamBridge = streamBridge;
         
