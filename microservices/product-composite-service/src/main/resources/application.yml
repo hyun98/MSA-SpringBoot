@@ -63,6 +63,8 @@ logging:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
 spring:
+  application:
+    name: product-composite
   profiles:
     group:
       "docker": "docker"
