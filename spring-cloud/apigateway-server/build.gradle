@@ -13,12 +13,23 @@ repositories {
 }
 
 ext {
-	set('springCloudVersion', "2021.0.3")
+	springCloudVersion = "2021.0.2"
+}
+
+jar {
+	enabled = false
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+//	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+
+	annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

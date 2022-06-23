@@ -1,6 +1,14 @@
 version: '2.4'
 
 services:
+  gateway:
+    build: spring-cloud/apigateway-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    mem_limit: 350m
+    ports:
+      - "8080:8080"
+  
   product:
     build: microservices/product-service
     mem_limit: 350m
@@ -42,8 +50,6 @@ services:
   product-composite:
     build: microservices/product-composite-service
     mem_limit: 350m
-    ports:
-      - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
