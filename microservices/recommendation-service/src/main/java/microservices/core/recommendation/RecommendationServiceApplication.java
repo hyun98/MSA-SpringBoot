@@ -18,7 +18,7 @@ public class RecommendationServiceApplication {
 
 		String mongodbHost = ctx.getEnvironment().getProperty("spring.data.mongodb.host");
 		String mongodbPort = ctx.getEnvironment().getProperty("spring.data.mongodb.port");
-		LOG.info("Connected to MondoDb: " + mongodbHost + ":" + mongodbPort);
+		LOG.info("Connected to MongoDB: " + mongodbHost + ":" + mongodbPort);
 	}
 
 }
