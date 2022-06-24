@@ -38,14 +38,16 @@ spring:
 
 management:
   endpoints:
+    health:
+      show-details: always
     web:
       base-path: /actuator
       path-mapping:
         health: health
-      health:
-        show-details: always
       exposure:
         include: "*"
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
 
 logging:
   level:

@@ -82,12 +82,12 @@ spring:
 
 management:
   endpoints:
+    health:
+      show-details: always
     web:
       base-path: /actuator
       path-mapping:
         health: health
-      health:
-        show-details: always
       exposure:
         include: "*"
 
