@@ -1,15 +1,15 @@
 package microservices.core.productcomposite.services;
 
 import lombok.RequiredArgsConstructor;
-import microservices.api.composite.product.*;
+import microservices.api.composite.product.ProductAggregate;
+import microservices.api.composite.product.ProductCompositeService;
+import microservices.api.composite.product.ServiceAddresses;
 import microservices.api.core.product.dto.ProductDTO;
 import microservices.api.core.recommendation.dto.RecommendationDTO;
 import microservices.api.core.review.dto.ReviewDTO;
-import microservices.util.exceptions.NotFoundException;
 import microservices.util.http.ServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 

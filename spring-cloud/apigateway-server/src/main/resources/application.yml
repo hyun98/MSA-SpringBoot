@@ -1,5 +1,5 @@
 server:
-  port: 7005
+  port: 8443
 
 spring:
   application:
@@ -11,7 +11,7 @@ spring:
     gateway:
       routes:
       - id: product-composite
-        uri: http://product-composite:8080
+        uri: http://product-composite
         predicates:
           - Path=/product-composite/**
       - id: host_route_200
@@ -36,20 +36,6 @@ spring:
         filters:
           - SetPath=/501
 
-app:
-  product-composite-service:
-    host: product-composite
-    port: 8080
-  product-service:
-    host: product
-    port: 8080
-  recommendation-service:
-    host: recommendation
-    port: 8080
-  review-service:
-    host: review
-    port: 8080
-
 management:
   endpoints:
     web:
@@ -58,8 +44,8 @@ management:
         health: health
       health:
         show-details: always
-management.endpoint.health.show-details: "ALWAYS"
-management.endpoints.web.exposure.include: "*"
+      exposure:
+        include: "*"
 
 logging:
   level:
@@ -72,5 +58,3 @@ spring:
   config:
     activate:
       on-profile: "docker"
-server:
-  port: 8080

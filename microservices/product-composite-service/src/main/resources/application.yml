@@ -45,23 +45,6 @@ server:
   error:
     include-message: always
 
-app:
-  product-service:
-    host: localhost
-    port: 7001
-  recommendation-service:
-    host: localhost
-    port: 7002
-  review-service:
-    host: localhost
-    port: 7003
-
-logging:
-  level:
-    root: INFO
-    microservices.core: DEBUG
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-
 spring:
   application:
     name: product-composite
@@ -89,13 +72,13 @@ spring:
       bindings:
         products-out-0:
           destination: products
-          required-groups: auditGroup
+          group: productsGroup
         recommendations-out-0:
           destination: recommendations
-          required-groups: auditGroup
+          group: recommendationsGroup
         reviews-out-0:
           destination: reviews
-          required-groups: auditGroup
+          group: reviewsGroup
 
 management:
   endpoints:
@@ -105,10 +88,19 @@ management:
         health: health
       health:
         show-details: always
-        
-#management.endpoint.health.show-details: "ALWAYS"
-#management.endpoints.web.exposure.include: "*"
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    root: INFO
+    microservices.core: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    
 ---
+server:
+  port: 80
+
 spring:
   config:
     activate:
@@ -120,21 +112,6 @@ spring:
       kafka:
         binder:
           brokers: kafka
-
-server:
-  port: 8080
-
-app:
-  product-service:
-    host: product
-    port: 8080
-  recommendation-service:
-    host: recommendation
-    port: 8080
-  review-service:
-    host: review
-    port: 8080
-
 ---
 spring:
   config:

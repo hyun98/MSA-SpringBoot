@@ -3,14 +3,16 @@ version: '2.4'
 services:
   gateway:
     build: spring-cloud/apigateway-server
+    image: henu/apigateway-server
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     mem_limit: 350m
     ports:
-      - "8080:8080"
+      - "8443:8443"
   
   product:
     build: microservices/product-service
+    image: henu/product-service
     mem_limit: 350m
     environment:
       SPRING_PROFILES_ACTIVE: docker
@@ -22,6 +24,7 @@ services:
 
   recommendation:
     build: microservices/recommendation-service
+    image: henu/recommendation-service
     mem_limit: 350m
     environment:
       - SPRING_PROFILES_ACTIVE=docker
@@ -33,6 +36,7 @@ services:
       
   review:
     build: microservices/review-service
+    image: henu/review-service
     mem_limit: 350m
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/review-db
@@ -49,6 +53,7 @@ services:
 
   product-composite:
     build: microservices/product-composite-service
+    image: henu/product-composite-service
     mem_limit: 350m
     environment:
       - SPRING_PROFILES_ACTIVE=docker

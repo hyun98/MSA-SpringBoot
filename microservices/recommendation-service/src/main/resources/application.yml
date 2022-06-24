@@ -1,12 +1,6 @@
 server:
   port: 7002
 
-logging:
-  level:
-    root: INFO
-    microservices.core: DEBUG
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-
 spring:
   data:
     mongodb:
@@ -49,7 +43,16 @@ spring:
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
 
+logging:
+  level:
+    root: INFO
+    microservices.core: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    
 ---
+server:
+  port: 80
+  
 spring:
   config:
     activate:
@@ -64,7 +67,3 @@ spring:
       kafka:
         binder:
           brokers: kafka
-  
-server:
-  port: 8080
-

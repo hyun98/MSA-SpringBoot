@@ -1,12 +1,12 @@
 package microservices.core.productcomposite.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import microservices.api.core.product.dto.ProductDTO;
 import microservices.api.core.product.ProductService;
-import microservices.api.core.recommendation.dto.RecommendationDTO;
+import microservices.api.core.product.dto.ProductDTO;
 import microservices.api.core.recommendation.RecommendationService;
-import microservices.api.core.review.dto.ReviewDTO;
+import microservices.api.core.recommendation.dto.RecommendationDTO;
 import microservices.api.core.review.ReviewService;
+import microservices.api.core.review.dto.ReviewDTO;
 import microservices.api.event.Event;
 import microservices.util.exceptions.InvalidInputException;
 import microservices.util.exceptions.NotFoundException;
@@ -14,18 +14,10 @@ import microservices.util.http.HttpErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
@@ -34,14 +26,9 @@ import reactor.netty.http.client.HttpClient;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static microservices.api.event.Event.Type.CREATE;
 import static microservices.api.event.Event.Type.DELETE;
-import static org.springframework.http.HttpMethod.GET;
 import static reactor.core.publisher.Flux.empty;
 
 @Component
@@ -53,9 +40,9 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     
     private final ObjectMapper mapper;
 
-    private final String productServiceUrl;
-    private final String recommendationServiceUrl;
-    private final String reviewServiceUrl;
+    private final String productServiceUrl = "http://product";
+    private final String recommendationServiceUrl = "http://recommendation";
+    private final String reviewServiceUrl = "http://review";
     
     // for functional
     private final StreamBridge streamBridge;
@@ -64,16 +51,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     public ProductCompositeIntegration(
             WebClient.Builder webClient,
             ObjectMapper mapper,
-            StreamBridge streamBridge,
-
-            @Value("${app.product-service.host}") String productServiceHost,
-            @Value("${app.product-service.port}") int    productServicePort,
-
-            @Value("${app.recommendation-service.host}") String recommendationServiceHost,
-            @Value("${app.recommendation-service.port}") int    recommendationServicePort,
-
-            @Value("${app.review-service.host}") String reviewServiceHost,
-            @Value("${app.review-service.port}") int    reviewServicePort
+            StreamBridge streamBridge
     ) {
 
         HttpClient httpClient = HttpClient.create()
@@ -83,10 +61,6 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
                 .build();
         this.mapper = mapper;
         this.streamBridge = streamBridge;
-        
-        productServiceUrl        = "http://" + productServiceHost + ":" + productServicePort;
-        recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort;
-        reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort;
     }
     
     // Product
