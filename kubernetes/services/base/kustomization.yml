@@ -1,0 +1,6 @@
+resources:
+  - gateway.yml
+  - product-composite.yml
+  - product.yml
+  - recommendation.yml
+  - review.yml
