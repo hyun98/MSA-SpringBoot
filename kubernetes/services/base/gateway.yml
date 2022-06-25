@@ -19,9 +19,6 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "docker"
-          envFrom:
-            - secretRef:
-                name: config-client-credentials
           ports:
             - containerPort: 8443
           resources:
